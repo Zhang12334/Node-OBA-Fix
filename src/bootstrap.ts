@@ -10,56 +10,79 @@ import { config } from './config.js';
 import { logger } from './logger.js';
 import { TokenManager } from './token.js';
 import { IFileList } from './types.js';
-import { request } from 'https';
-import { URL } from 'url';
+import { request as httpRequest } from 'http';
+import { request as httpsRequest } from 'https';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const storageType = process.env.CLUSTER_STORAGE || 'file'; // 检查存储类型
 const davStorageUrl = process.env.CLUSTER_STORAGE_OPTIONS ? JSON.parse(process.env.CLUSTER_STORAGE_OPTIONS) : {};
 const davBaseUrl = `${davStorageUrl.url}/${davStorageUrl.basePath}`;
 
-// 创建测速文件函数
-async function createSpeedTestFile(filename: string, size: number): Promise<void> {
-  const redirectUrl = `${davBaseUrl}/${filename}`;
-  const content = Buffer.alloc(size * 1024 * 1024, '0066ccff', 'hex');
-  const url = new URL(redirectUrl);
-
-  const options = {
-    method: 'PUT',
-    hostname: url.hostname,
-    port: url.port || 443,
-    path: url.pathname,
-    headers: {
-      'Content-Type': 'application/octet-stream',
-      'Content-Length': content.length,
-      Authorization: `Basic ${Buffer.from(`${davStorageUrl.username}:${davStorageUrl.password}`).toString('base64')}`,
-    },
-  };
+async function makeRequest(
+  method: string,
+  url: string,
+  options: { headers?: Record<string, string>; auth?: { username: string; password: string } },
+  body?: Buffer
+): Promise<{ status: number; headers: Record<string, string>; data: Buffer }> {
+  const isHttps = url.startsWith('https');
+  const reqModule = isHttps ? httpsRequest : httpRequest;
 
   return new Promise((resolve, reject) => {
-    const req = request(options, (res) => {
-      if (res.statusCode === 200 || res.statusCode === 201) {
-        logger.info(`已生成测速文件: ${filename}`);
-        resolve();
-      } else {
-        logger.error(`创建测速文件失败: ${res.statusCode}`);
-        reject(new Error(`Failed to create file: ${res.statusCode}`));
+    const { username, password } = options.auth || {};
+    const authHeader = username && password ? `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}` : undefined;
+
+    const req = reqModule(
+      url,
+      {
+        method,
+        headers: {
+          ...options.headers,
+          ...(authHeader ? { Authorization: authHeader } : {}),
+        },
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('end', () => {
+          const data = Buffer.concat(chunks);
+          resolve({ status: res.statusCode || 500, headers: res.headers as Record<string, string>, data });
+        });
       }
-    });
+    );
 
-    req.on('error', (err) => {
-      logger.error(err, `创建测速文件 ${filename} 失败`);
-      reject(err);
-    });
+    req.on('error', reject);
 
-    req.write(content);
+    if (body) {
+      req.write(body);
+    }
     req.end();
   });
 }
 
+// 创建测速文件函数
+async function createSpeedTestFile(filename: string, size: number): Promise<void> {
+  const redirectUrl = `${davBaseUrl}/${filename}`;
+  const content = Buffer.alloc(size * 1024 * 1024, '0066ccff', 'hex');
+  try {
+    const response = await makeRequest('PUT', redirectUrl, {
+      headers: { 'Content-Type': 'application/octet-stream' },
+      auth: { username: davStorageUrl.username, password: davStorageUrl.password },
+    }, content);
+
+    if (response.status === 200) {
+      logger.info(`已生成测速文件: ${filename}`);
+    } else {
+      logger.error(`生成测速文件失败，状态码: ${response.status}`);
+    }
+  } catch (error) {
+    logger.error(error, `创建测速文件 ${filename} 失败`);
+    throw error;
+  }
+}
+
 export async function bootstrap(version: string): Promise<void> {
   logger.info(colors.green(`Booting Node-OBA-Fix`));
-  logger.info(colors.green(`当前版本: 1.4`));
+  logger.info(colors.green(`当前版本: 1.3`));
   logger.info(colors.green(`协议版本: ${version}`));
   const tokenManager = new TokenManager(config.clusterId, config.clusterSecret, version);
   await tokenManager.getToken();
