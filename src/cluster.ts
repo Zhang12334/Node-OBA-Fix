@@ -560,19 +560,27 @@ export class Cluster {
   }
 
   public gcBackground(files: IFileList): void {
+    // 过滤掉 measure 文件夹中的文件
+    const filteredFiles = files.files.filter((file) => {
+      const measurePath = join('measure', '/');
+      return !file.path.startsWith(measurePath);
+    });
+  
+    // 调用存储的 gc 方法处理过滤后的文件
     this.storage
-      .gc(files.files)
+      .gc(filteredFiles)
       .then((res) => {
         if (res.count === 0) {
-          logger.info('没有过期文件')
+          logger.info('没有过期文件');
         } else {
-          logger.info(`文件回收完成，共删除${res.count}个文件，释放空间${prettyBytes(res.size)}`)
+          logger.info(`文件回收完成，共删除${res.count}个文件，释放空间${prettyBytes(res.size)}`);
         }
       })
       .catch((e: unknown) => {
-        logger.error({err: e}, 'gc error')
-      })
+        logger.error({ err: e }, 'gc error');
+      });
   }
+  
 
   private async _enable(): Promise<void> {
     let err: unknown
