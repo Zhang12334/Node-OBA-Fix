@@ -15,7 +15,9 @@ import {IFileList} from './types.js'
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
 export async function bootstrap(version: string): Promise<void> {
-  logger.info(colors.green(`booting openbmclapi ${version}`))
+  logger.info(colors.green(`Booting Node-OBA-Fix`))
+  logger.info(colors.green(`当前版本: 1.2`))
+  logger.info(colors.green(`协议版本: ${version}`))
   const tokenManager = new TokenManager(config.clusterId, config.clusterSecret, version)
   await tokenManager.getToken()
   const cluster = new Cluster(config.clusterSecret, version, tokenManager)

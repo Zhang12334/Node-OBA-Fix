@@ -48,23 +48,5 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_name }}
 
-  create-release:
-    runs-on: "ubuntu-latest"
-    name: "Create Release"
-    needs: "build-tar-ball"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: ${{ contains(github.ref, '-') }}
-          files: |
-              openbmclapi-linux.tar.xz
-              openbmclapi-windows.tar.gz
-              openbmclapi-macos.tar.xz
-
 
 

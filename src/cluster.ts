@@ -327,7 +327,7 @@ export class Cluster {
         return next(err)
       }
     })
-    app.use('/measure', MeasureRouteFactory(config))
+    app.use('/measure', MeasureRouteFactory(config, this.storage));
     let server: Server
     if (https) {
       server = createSecureServer(
