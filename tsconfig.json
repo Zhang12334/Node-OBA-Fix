@@ -2,6 +2,7 @@
   "extends": ["@tsconfig/node18"],
   "compilerOptions": {
     "sourceMap": true,
+    "esModuleInterop": true,
     "noUnusedLocals": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

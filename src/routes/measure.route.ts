@@ -3,7 +3,7 @@ import type { Config } from '../config.js';
 import { checkSign } from '../util.js';
 import type { IStorage } from '../storage/base.storage.js';
 import { join } from 'path';
-import axios, { AxiosError } from 'Axios';
+import fetch from 'node-fetch';
 import { logger } from '../logger.js';
 
 const storageType = process.env.CLUSTER_STORAGE || 'file';
@@ -15,10 +15,10 @@ async function getRedirectUrl(filename: string, size: number, storage: IStorage)
     const redirectUrl = `${davBaseUrl}/${filename}`;
 
     try {
-      const response = await axios.head(redirectUrl, {
-        auth: {
-          username: davStorageUrl.username,
-          password: davStorageUrl.password,
+      const response = await fetch(redirectUrl, {
+        method: 'HEAD',
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${davStorageUrl.username}:${davStorageUrl.password}`).toString('base64')}`,
         },
       });
 
@@ -27,32 +27,38 @@ async function getRedirectUrl(filename: string, size: number, storage: IStorage)
       }
 
       if (response.status === 302) {
-        const newRedirectUrl = response.headers['location'];
-        return newRedirectUrl;
+        const newRedirectUrl = response.headers.get('location');
+        if (newRedirectUrl) {
+          return newRedirectUrl;
+        }
       }
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.isAxiosError && axiosError.response?.status === 302) {
-        const newRedirectUrl = axiosError.response.headers['location'];
-        return newRedirectUrl;
-      }
-      logger.error(axiosError, '获取DAV存储重定向地址失败');
-      throw axiosError;
+      logger.error(error, '获取DAV存储重定向地址失败');
+      throw error;
     }
 
     // 如果文件不存在，生成文件逻辑
     const content = Buffer.alloc(size * 1024 * 1024, '0066ccff', 'hex');
-    await axios.put(redirectUrl, content, {
-      auth: {
-        username: davStorageUrl.username,
-        password: davStorageUrl.password,
-      },
-      headers: {
-        'Content-Type': 'application/octet-stream',
-      },
-    });
-    logger.info(`已生成测速文件: ${size}MB`);
-    return redirectUrl;
+    try {
+      const response = await fetch(redirectUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${davStorageUrl.username}:${davStorageUrl.password}`).toString('base64')}`,
+          'Content-Type': 'application/octet-stream',
+        },
+        body: content,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload file: ${response.statusText}`);
+      }
+
+      logger.info(`已生成测速文件: ${size}MB`);
+      return redirectUrl;
+    } catch (error) {
+      logger.error(error, '上传文件失败');
+      throw error;
+    }
   } else {
     // 原有方法逻辑
     const basePath = process.env.CLUSTER_MEASURE_302PATH || '';
