@@ -2,8 +2,8 @@ name: "Release Binary"
 
 on:
   push:
-    branches:
-      - "**"
+    tags:
+      - "v*"
 
 jobs:
   build-tar-ball:
@@ -48,4 +48,20 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_name }}
 
+  create-release:
+    runs-on: "ubuntu-latest"
+    name: "Create Release"
+    needs: "build-tar-ball"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.RELEASE_TOKEN }}"
+          files: |
+              openbmclapi-linux.tar.xz
+              openbmclapi-windows.tar.gz
+              openbmclapi-macos.tar.xz
 

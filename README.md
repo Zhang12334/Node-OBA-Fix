@@ -75,13 +75,43 @@ CLUSTER_SECRET=你的节点密钥
 CLUSTER_PORT=你的开放端口
 # 更多变量请看上方变量的详细解释
 ```
+### Alist使用方法
+在.env中加上
+```env
+CLUSTER_STORAGE=alist
+CLUSTER_STORAGE_OPTIONS={"url":"http://127.0.0.1:5244/dav","basePath":"oba","username":"admin","password":"admin" }
+#                                      ↑AList地址(别忘了加/dav)         ↑文件路径          ↑账号(有webdav权限)  ↑密码
+```
+按照需要修改
+
+### 温馨提示
+
+如从 Go 端迁移至 Node 端，你Alist里面的目录应该是这样的：
+
+```file_tree
+oba/
+├── download/
+│   ├── 00/
+│   ├── 01/
+|   ├── 03/
+│   └── xx(下面一堆文件夹,不一一列举)/
+├── measure/
+│   ├── 1
+│   ├── 2
+│   └── 3
+```
+此时你basepath的地址就应该填写"oba/download"
 
 如果配置无误的话, 运行程序, 就会开始拉取文件, 拉取完成后就会开始等待服务器分发请求了
 
-### 同步数据
+## 同步数据
 
 openbmclapi 会自行同步需要的文件, 但是初次同步可能会速度过慢, 如果您的节点是个全量节点, 可以通过以下命令使用rsync快速同步
 以下三台rsync服务器是相同的, 你可以选择任意一台进行同步
 - `rsync -rzvP openbmclapi@home.933.moe::openbmclapi cache`
 - `rsync -avP openbmclapi@storage.yserver.ink::bmcl cache`
 - `rsync -azvrhP openbmclapi@openbmclapi.home.mxd.moe::data cache`
+
+## 致谢
+
+- [**bangbang93**](https://github.com/bangbang93) 本项目fork自bangbang93的OpenBMCLAPI项目

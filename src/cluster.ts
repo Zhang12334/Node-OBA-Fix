@@ -22,7 +22,7 @@ import {userInfo} from 'node:os'
 import {tmpdir} from 'os'
 import pMap from 'p-map'
 import pRetry from 'p-retry'
-import {dirname, join} from 'path'
+import {dirname, join, relative, normalize} from 'path'
 import prettyBytes from 'pretty-bytes'
 import {connect, Socket} from 'socket.io-client'
 import {Tail} from 'tail'
@@ -142,7 +142,7 @@ export class Cluster {
       if (addr.range() !== 'unicast') {
         throw new Error(`无法获取公网IP, UPNP返回的IP位于私有地址段, IP: ${ip}`)
       }
-      logger.info(`upnp映射成功，外网IP: ${ip}`)
+      logger.info(`upnp映射成功, 外网IP: ${ip}`)
       this.host ??= ip
     }
   }
@@ -413,6 +413,7 @@ export class Cluster {
         throw new Error('server not setup')
       }
       this.server.listen(this._port, resolve)
+      logger.debug('端口已监听');
     })
   }
 
@@ -506,30 +507,42 @@ export class Cluster {
   public async downloadFile(hash: string): Promise<void> {
     const res = await this.got.get(`openbmclapi/download/${hash}`, {
       responseType: 'buffer',
-      searchParams: {noopen: 1},
-    })
-
+      searchParams: { noopen: 1 },
+    });
+  
     await this.storage.writeFile(hashToFilename(hash), res.body, {
       path: `/download/${hash}`,
       hash,
       size: res.body.length,
       mtime: Date.now(),
-    })
+    });
   }
+  
 
   public async requestCert(): Promise<void> {
-    if (!this.socket) throw new Error('未连接到服务器')
-    const [err, cert] = (await this.socket.emitWithAck('request-cert')) as [object, {cert: string; key: string}]
-    if (err) {
-      if (typeof err === 'object' && 'message' in err) {
-        throw new Error(err.message as string)
-      } else {
-        throw new Error('请求证书失败', {cause: err})
-      }
+    logger.debug('正在尝试请求证书');
+    if (!this.socket) {
+        throw new Error('未连接到服务器');
     }
-    await fse.outputFile(join(this.tmpDir, 'cert.pem'), cert.cert)
-    await fse.outputFile(join(this.tmpDir, 'key.pem'), cert.key)
+
+    logger.debug('正在通过socket请求证书');
+    const [err, cert] = (await this.socket.emitWithAck('request-cert')) as [object, {cert: string; key: string}];
+
+    if (err) {
+        logger.debug('请求证书时发生错误', err);
+        if (typeof err === 'object' && 'message' in err) {
+            throw new Error(err.message as string);
+        } else {
+            throw new Error('请求证书失败', {cause: err});
+        }
+    }
+
+    logger.debug('证书请求成功，正在保存证书文件');
+    await fse.outputFile(join(this.tmpDir, 'cert.pem'), cert.cert);
+    await fse.outputFile(join(this.tmpDir, 'key.pem'), cert.key);
+    logger.debug('证书文件保存成功');
   }
+
 
   public async useSelfCert(): Promise<void> {
     if (!config.sslCert) {
@@ -560,10 +573,13 @@ export class Cluster {
   }
 
   public gcBackground(files: IFileList): void {
-    // 过滤掉 measure 文件夹中的文件
+    // 规范化 measure 文件夹路径
+    const measurePath = normalize('measure/');
+  
+    // 过滤掉 measure 目录中的文件
     const filteredFiles = files.files.filter((file) => {
-      const measurePath = join('measure', '/');
-      return !file.path.startsWith(measurePath);
+      const relativePath = relative(measurePath, file.path);
+      return relativePath.startsWith('..'); // 如果文件不在 measure 内，返回 true
     });
   
     // 调用存储的 gc 方法处理过滤后的文件
@@ -573,7 +589,7 @@ export class Cluster {
         if (res.count === 0) {
           logger.info('没有过期文件');
         } else {
-          logger.info(`文件回收完成，共删除${res.count}个文件，释放空间${prettyBytes(res.size)}`);
+          logger.info(`文件回收完成，共删除 ${res.count} 个文件，释放空间 ${prettyBytes(res.size)}`);
         }
       })
       .catch((e: unknown) => {

@@ -10,79 +10,41 @@ import { config } from './config.js';
 import { logger } from './logger.js';
 import { TokenManager } from './token.js';
 import { IFileList } from './types.js';
-import { request as httpRequest } from 'http';
-import { request as httpsRequest } from 'https';
+import got from 'got';
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const storageType = process.env.CLUSTER_STORAGE || 'file'; // 检查存储类型
 const davStorageUrl = process.env.CLUSTER_STORAGE_OPTIONS ? JSON.parse(process.env.CLUSTER_STORAGE_OPTIONS) : {};
 const davBaseUrl = `${davStorageUrl.url}/${davStorageUrl.basePath}`;
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const storageType = process.env.CLUSTER_STORAGE || 'file'; // 检查存储类型
 
-async function makeRequest(
-  method: string,
-  url: string,
-  options: { headers?: Record<string, string>; auth?: { username: string; password: string } },
-  body?: Buffer
-): Promise<{ status: number; headers: Record<string, string>; data: Buffer }> {
-  const isHttps = url.startsWith('https');
-  const reqModule = isHttps ? httpsRequest : httpRequest;
-
-  return new Promise((resolve, reject) => {
-    const { username, password } = options.auth || {};
-    const authHeader = username && password ? `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}` : undefined;
-
-    const req = reqModule(
-      url,
-      {
-        method,
-        headers: {
-          ...options.headers,
-          ...(authHeader ? { Authorization: authHeader } : {}),
-        },
-      },
-      (res) => {
-        const chunks: Buffer[] = [];
-        res.on('data', (chunk) => chunks.push(chunk));
-        res.on('end', () => {
-          const data = Buffer.concat(chunks);
-          resolve({ status: res.statusCode || 500, headers: res.headers as Record<string, string>, data });
-        });
-      }
-    );
-
-    req.on('error', reject);
-
-    if (body) {
-      req.write(body);
-    }
-    req.end();
-  });
-}
-
-// 创建测速文件函数
-async function createSpeedTestFile(filename: string, size: number): Promise<void> {
-  const redirectUrl = `${davBaseUrl}/${filename}`;
+async function createAndUploadFileToAlist(size: number): Promise<string> {
   const content = Buffer.alloc(size * 1024 * 1024, '0066ccff', 'hex');
-  try {
-    const response = await makeRequest('PUT', redirectUrl, {
-      headers: { 'Content-Type': 'application/octet-stream' },
-      auth: { username: davStorageUrl.username, password: davStorageUrl.password },
-    }, content);
+  const uploadUrl = `${davBaseUrl}/measure/${size}MB`;
 
-    if (response.status === 200) {
-      logger.info(`已生成测速文件: ${filename}`);
-    } else {
-      logger.error(`生成测速文件失败，状态码: ${response.status}`);
+  try {
+    await got.put(uploadUrl, {
+      body: content,
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${davStorageUrl.username}:${davStorageUrl.password}`).toString('base64')}`,
+        'Content-Type': 'application/octet-stream'
+      },
+      https: { rejectUnauthorized: false }
+    });
+    logger.debug(`测速文件已成功上传: ${uploadUrl}`);
+  } catch (uploadError: any) {
+    logger.error(`测速文件上传失败: ${uploadError}`);
+    if (uploadError.response) {
+      logger.error(`测速文件上传响应状态码: ${uploadError.response.statusCode}`);
+      logger.error(`测速文件上传相应body: ${uploadError.response.body}`);
     }
-  } catch (error) {
-    logger.error(error, `创建测速文件 ${filename} 失败`);
-    throw error;
+    throw uploadError;
   }
+  return uploadUrl;
 }
 
 export async function bootstrap(version: string): Promise<void> {
   logger.info(colors.green(`Booting Node-OBA-Fix`));
-  logger.info(colors.green(`当前版本: 1.3`));
+  logger.info(colors.green(`当前版本: 1.5`));
   logger.info(colors.green(`协议版本: ${version}`));
   const tokenManager = new TokenManager(config.clusterId, config.clusterSecret, version);
   await tokenManager.getToken();
@@ -105,14 +67,19 @@ export async function bootstrap(version: string): Promise<void> {
   }
 
   if (config.enableNginx) {
+    logger.debug('正在启用Nginx');
     if (typeof cluster.port === 'number') {
+      logger.debug('Nginx端口合法, 正在启动');
       await cluster.setupNginx(join(__dirname, '..'), cluster.port, proto);
     } else {
       throw new Error('cluster.port is not a number');
     }
   }
+  logger.debug('正在启动Express服务');
   const server = cluster.setupExpress(proto === 'https' && !config.enableNginx);
+  logger.debug('正在监听端口');
   await cluster.listen();
+  logger.debug('正在检查端口');
   await cluster.portCheck();
 
   const storageReady = await cluster.storage.check();
@@ -122,14 +89,19 @@ export async function bootstrap(version: string): Promise<void> {
 
   // 如果是 alist 类型存储，生成 10MB 的测速文件
   if (storageType === 'alist') {
-    const speedTestFilename = '10MB';
+    logger.debug('准备生成测速文件');
     try {
-      await createSpeedTestFile(speedTestFilename, 10); // 调用生成测速文件函数
+      // 同时生成 1MB 和 10MB 测速文件
+      await Promise.all([
+        createAndUploadFileToAlist(1),
+        createAndUploadFileToAlist(10),
+      ]);
     } catch (error) {
       logger.error(error, '生成测速文件失败');
       throw new Error('测速文件生成失败');
     }
   }
+  
 
   const configuration = await cluster.getConfiguration();
   const files = await cluster.getFileList();
@@ -138,7 +110,7 @@ export async function bootstrap(version: string): Promise<void> {
     await cluster.syncFiles(files, configuration.sync);
   } catch (e) {
     if (e instanceof HTTPError) {
-      logger.error({ url: e.response.url }, 'download error');
+      logger.error({ url: e.response.url }, '下载失败');
     }
     throw e;
   }
@@ -163,7 +135,7 @@ export async function bootstrap(version: string): Promise<void> {
   } catch (e) {
     logger.fatal(e);
     if (process.env.NODE_ENV === 'development') {
-      logger.fatal('development mode, not exiting');
+      logger.fatal('调试模式已开启, 不进行退出');
     } else {
       cluster.exit(1);
     }
@@ -204,7 +176,7 @@ export async function bootstrap(version: string): Promise<void> {
     }
     await cluster.disable();
 
-    logger.info('unregister success, waiting for background task, ctrl+c again to force kill');
+    logger.info('已成功取消注册节点, 正在等待进程结束, 再次按下 Ctrl+C 以强制停止进程');
     server.close();
     cluster.nginxProcess?.kill();
   };

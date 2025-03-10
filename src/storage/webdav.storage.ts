@@ -142,32 +142,35 @@ export class WebdavStorage implements IStorage {
   }
 
   public async gc(files: {path: string; hash: string; size: number}[]): Promise<IGCCounter> {
-    const counter = {count: 0, size: 0}
-    const fileSet = new Set<string>()
+    const counter = {count: 0, size: 0};
+    const fileSet = new Set<string>();
     for (const file of files) {
-      fileSet.add(file.hash)
+        fileSet.add(file.hash);
     }
-    const queue = [this.basePath]
+    const queue = [this.basePath];
     do {
-      const dir = queue.pop()
-      if (!dir) break
-      const entries = (await this.client.getDirectoryContents(dir)) as FileStat[]
-      entries.sort((a, b) => a.basename.localeCompare(b.basename))
-      for (const entry of entries) {
-        if (entry.type === 'directory') {
-          queue.push(entry.filename)
-          continue
+        const dir = queue.pop();
+        if (!dir) break;
+        if (dir.includes('/measure/') || dir.endsWith('/measure')) {
+            continue; // 跳过 measure
         }
-        if (!fileSet.has(entry.basename)) {
-          logger.info(colors.gray(`delete expire file: ${entry.filename}`))
-          await this.client.deleteFile(entry.filename)
-          this.files.delete(entry.basename)
-          counter.count++
-          counter.size += entry.size
+        const entries = (await this.client.getDirectoryContents(dir)) as FileStat[];
+        entries.sort((a, b) => a.basename.localeCompare(b.basename));
+        for (const entry of entries) {
+            if (entry.type === 'directory') {
+                queue.push(entry.filename);
+                continue;
+            }
+            if (!fileSet.has(entry.basename)) {
+                logger.info(colors.gray(`delete expire file: ${entry.filename}`));
+                await this.client.deleteFile(entry.filename);
+                this.files.delete(entry.basename);
+                counter.count++;
+                counter.size += entry.size;
+            }
         }
-      }
-    } while (queue.length !== 0)
-    return counter
+    } while (queue.length !== 0);
+    return counter;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await

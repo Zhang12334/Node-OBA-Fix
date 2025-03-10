@@ -51,26 +51,39 @@ export class FileStorage implements IStorage {
     )
   }
 
-  public async gc(files: {path: string; hash: string; size: number}[]): Promise<IGCCounter> {
-    const counter = {count: 0, size: 0}
+  public async gc(files: { path: string; hash: string; size: number }[]): Promise<IGCCounter> {
+    const counter = { count: 0, size: 0 }
     const fileSet = new Set<string>()
+  
     for (const file of files) {
       fileSet.add(hashToFilename(file.hash))
     }
+  
     const queue = [this.cacheDir]
+  
     do {
       const dir = queue.pop()
       if (!dir) break
+  
       const entries = await readdir(dir)
       for (const entry of entries) {
         const p = join(dir, entry)
         const s = await stat(p)
+  
         if (s.isDirectory()) {
           queue.push(p)
           continue
         }
+  
         const cacheDirWithSep = this.cacheDir + sep
-        if (!fileSet.has(p.replace(cacheDirWithSep, ''))) {
+        const relativePath = p.replace(cacheDirWithSep, '')
+  
+        // 跳过 measure 目录下的文件
+        if (relativePath.startsWith(`measure${sep}`) || relativePath === 'measure') {
+          continue
+        }        
+  
+        if (!fileSet.has(relativePath)) {
           logger.info(colors.gray(`delete expire file: ${p}`))
           await unlink(p)
           counter.count++
@@ -78,8 +91,9 @@ export class FileStorage implements IStorage {
         }
       }
     } while (queue.length !== 0)
+  
     return counter
-  }
+  }  
 
   public async express(hashPath: string, req: Request, res: Response): Promise<{bytes: number; hits: number}> {
     const name = req.query.name as string
