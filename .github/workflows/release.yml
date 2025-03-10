@@ -26,7 +26,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      ## linux & macos
+      ## Linux & MacOS
       - run: npm run build
       - run: |
           cp $(which node) .
@@ -34,7 +34,7 @@ jobs:
           tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
-      ## windows
+      ## Windows
       - run: |
           $SRC = (Get-Command node.exe).Path
           copy $SRC node.exe
