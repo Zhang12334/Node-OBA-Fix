@@ -13,11 +13,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: "openbmclapi-linux.tar.xz"
+            artifact_name: "Node-OBA-Fix-linux.tar.xz"
           - os: windows-latest
-            artifact_name: "openbmclapi-windows.tar.gz"
+            artifact_name: "Node-OBA-Fix-windows.tar.gz"
           - os: macos-latest
-            artifact_name: "openbmclapi-macos.tar.xz"
+            artifact_name: "Node-OBA-Fix-macos.tar.xz"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
           repo_token: "${{ secrets.RELEASE_TOKEN }}"
           prerelease: false
           files: |
-              openbmclapi-linux.tar.xz
-              openbmclapi-windows.tar.gz
-              openbmclapi-macos.tar.xz
+              Node-OBA-Fix-linux.tar.xz
+              Node-OBA-Fix-windows.tar.gz
+              Node-OBA-Fix-macos.tar.xz
 
