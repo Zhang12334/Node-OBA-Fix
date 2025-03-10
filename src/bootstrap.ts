@@ -44,7 +44,7 @@ async function createAndUploadFileToAlist(size: number): Promise<string> {
 
 export async function bootstrap(version: string): Promise<void> {
   logger.info(colors.green(`Booting Node-OBA-Fix`));
-  logger.info(colors.green(`当前版本: 1.5`));
+  logger.info(colors.green(`当前版本: 1.5.0`));
   logger.info(colors.green(`协议版本: ${version}`));
   const tokenManager = new TokenManager(config.clusterId, config.clusterSecret, version);
   await tokenManager.getToken();
