@@ -72,7 +72,7 @@ export async function bootstrap(version: string): Promise<void> {
       logger.debug('Nginx端口合法, 正在启动');
       await cluster.setupNginx(join(__dirname, '..'), cluster.port, proto);
     } else {
-      throw new Error('cluster.port is not a number');
+      throw new Error('Nginx端口不合法');
     }
   }
   logger.debug('正在启动Express服务');
