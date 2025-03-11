@@ -1,9 +1,6 @@
 name: "Release Binary"
 
-on:
-  push:
-    tags:
-      - "v*"
+on: push
 
 jobs:
   build-tar-ball:
@@ -13,11 +10,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: "Node-OBA-Fix-linux.tar.xz"
+            artifact_name: "Node-OBA-Fix-linux-Build${{ github.run_number }}.tar.xz"
           - os: windows-latest
-            artifact_name: "Node-OBA-Fix-windows.tar.gz"
+            artifact_name: "Node-OBA-Fix-windows-Build${{ github.run_number }}.tar.gz"
           - os: macos-latest
-            artifact_name: "Node-OBA-Fix-macos.tar.xz"
+            artifact_name: "Node-OBA-Fix-macos-Build${{ github.run_number }}.tar.xz"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -47,22 +44,3 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_name }}
-
-  create-release:
-    runs-on: "ubuntu-latest"
-    name: "Create Release"
-    needs: "build-tar-ball"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.RELEASE_TOKEN }}"
-          prerelease: false
-          files: |
-              Node-OBA-Fix-linux.tar.xz
-              Node-OBA-Fix-windows.tar.gz
-              Node-OBA-Fix-macos.tar.xz
-
