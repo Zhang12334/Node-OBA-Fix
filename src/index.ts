@@ -10,7 +10,10 @@ const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.js
   version: string
 }
 
+// 加载环境变量
 config()
+
+// 如果以非守护进程模式运行，直接启动应用
 if (process.env.NO_DAEMON || !cluster.isPrimary) {
   bootstrap(packageJson.version).catch((err) => {
     // eslint-disable-next-line no-console
@@ -20,6 +23,7 @@ if (process.env.NO_DAEMON || !cluster.isPrimary) {
   })
 }
 
+// 如果以守护进程模式运行，创建子进程
 if (!process.env.NO_DAEMON && cluster.isPrimary) {
   forkWorker()
 }
@@ -29,18 +33,35 @@ let backoff = 1
 
 function forkWorker(): void {
   const worker = cluster.fork()
+
+  // 监听退出
   worker.on('exit', (code, signal) => {
-    logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${backoff}秒后重启`)
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    setTimeout(() => forkWorker(), backoff * 1000)
-    backoff = Math.min(backoff * BACKOFF_FACTOR, 60)
-  })
-  worker.on('message', (msg: unknown) => {
-    if (msg === 'ready') {
-      backoff = 1
+    if (process.env.RESTART_PROCESS === 'false') {
+      // 不启用自动重启
+      logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, 正在退出进程`)      
+    } else {
+      // 如果启用自动重启
+      const delay = process.env.ENABLE_EXIT_DELAY === 'true'
+        ? parseInt(process.env.EXIT_DELAY || '3', 10) * 1000 // 使用自定义延迟时间
+        : backoff * 1000 // 使用退避策略
+
+      logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`)
+      setTimeout(() => forkWorker(), delay)
+
+      // 如果未启用自定义延迟, 更新退避时间
+      if (process.env.ENABLE_EXIT_DELAY !== 'true') {
+        backoff = Math.min(backoff * BACKOFF_FACTOR, 60)
+      }
     }
   })
 
+  worker.on('message', (msg: unknown) => {
+    if (msg === 'ready') {
+      backoff = 1 // 重置退避时间
+    }
+  })
+
+  // 定义进程关闭逻辑
   function onStop(signal: string): void {
     worker.removeAllListeners('exit')
     worker.kill(signal)
@@ -55,6 +76,7 @@ function forkWorker(): void {
     ref.unref()
   }
 
+  // 监听 SIGINT 和 SIGTERM 信号
   process.on('SIGINT', onStop)
   process.on('SIGTERM', onStop)
 }

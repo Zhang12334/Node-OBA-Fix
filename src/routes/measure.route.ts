@@ -1,7 +1,7 @@
 import express, { type Router } from 'express';
 import type { Config } from '../config.js';
 import { checkSign } from '../util.js';
-import type { IStorage } from '../storage/base.storage.js'; // 假设有 IStorage 接口
+import type { IStorage } from '../storage/base.storage.js';
 import { join } from 'path';
 import { logger } from '../logger.js';
 import got from 'got'

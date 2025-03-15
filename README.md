@@ -18,32 +18,32 @@
 | ENABLE_NGINX        | 否  | false        | 使用 nginx 提供文件服务                                                                                        |
 | DISABLE_ACCESS_LOG  | 否  | false        | 禁用访问日志输出                                                                                               |
 | ENABLE_UPNP         | 否  | false        | 启用 UPNP 端口映射                                                                                           |
-| SSL_KEY             | 否  | -            | （仅当开启BYOC时）  SSL 证书私钥。可以直接粘贴证书内容，也可以填写文件名                                                              |
-| SSL_CERT            | 否  | -            | （仅当开启BYOC时）  SSL 证书公钥。可以直接粘贴证书内容，也可以填写文件名                                                              |
+| SSL_KEY             | 否  | -            | (仅当开启BYOC时) SSL 证书私钥, 可以直接粘贴证书内容，也可以填写文件名                                                              |
+| SSL_CERT            | 否  | -            | (仅当开启BYOC时) SSL 证书公钥, 可以直接粘贴证书内容，也可以填写文件名                                                              |
+| RESTART_PROCESS | 否 | true | 在当前进程意外退出后调用自身功能自动重启进程 |
+| ENABLE_EXIT_DELAY | 否 | false | 使用自定义固定秒数而非内置退避策略的重启前等待时间 |
+| EXIT_DELAY | 否 | 3 | 在重启前进行自定义秒数的延迟 |
+| LOGLEVEL | 否 | info | 切换日志等级 |
+
+在部分低配机器上, 程序自身的自动重启功能可能导致重连出现问题(出现卡死等情况)，建议使用外置重启进程(如MCSM的自动重启功能), 在配置文件中将 RESTART_PROCESS 设为 false 即可关闭程序自身的重启功能
 
 如果你在源码中发现了其他环境变量, 那么它们是为了方便开发而存在的, 可能会随时修改, 不要在生产环境中使用
 
 ## 安装
 
-### 安装包
-
-#### 所需环境
+### 所需环境
 
 - Node.js 20 以上
 - 一个支持 Node.js 的系统
 - 一个支持 Node.js 的架构
+
+### 安装包
 
 #### 下载
 
 从 [Github Release](https://github.com/bangbang93/openbmclapi/releases) 中选择对应你的系统的最新版本
 
 ### 从源码安装
-
-#### 所需环境
-
-- Node.js 20 以上
-- 一个支持 Node.js 的系统
-- 一个支持 Node.js 的架构
 
 #### 设置环境
 
@@ -86,7 +86,7 @@ CLUSTER_STORAGE_OPTIONS={"url":"http://127.0.0.1:5244/dav","basePath":"oba","use
 
 ### 温馨提示
 
-如从 Go 端迁移至 Node 端，你Alist里面的目录应该是这样的：
+如从 Go 端迁移至 Node 端，你Alist里面的目录应该是这样的:
 
 ```file_tree
 oba/
@@ -101,6 +101,21 @@ oba/
 │   └── 3
 ```
 此时你basepath的地址就应该填写"oba/download"
+
+或者再举个例子:
+
+```file_tree
+download/
+├── 00/
+├── 01/
+├── 03/
+└── xx(下面一堆文件夹,不一一列举)/
+measure/
+├── 1
+├── 2
+└── 3
+```
+如果你是这样, WEBDAV访问根目录就是download和measure的情况, 此时你basepath的地址就应该填写"download"
 
 如果配置无误的话, 运行程序, 就会开始拉取文件, 拉取完成后就会开始等待服务器分发请求了
 
