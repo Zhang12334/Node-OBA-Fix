@@ -62,10 +62,10 @@ export class TokenManager {
     const next = Math.max(ttl - ms('10m'), ttl / 2)
     setTimeout(() => {
       this.refreshToken().catch((err) => {
-        logger.error(err, 'refresh token error')
+        logger.error(err, '刷新 Token 失败')
       })
     }, next)
-    logger.trace(`schedule refresh token in ${next}ms`)
+    logger.trace(`计划在 ${next}ms 后刷新 Token`)
   }
 
   private async refreshToken(): Promise<void> {
@@ -77,7 +77,7 @@ export class TokenManager {
         },
       })
       .json<{token: string; ttl: number}>()
-    logger.debug('success fresh token')
+    logger.debug('刷新 Token 成功')
     this.scheduleRefreshToken(token.ttl)
     this.token = token.token
   }

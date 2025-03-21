@@ -34,7 +34,7 @@ export class Keepalive {
       clearTimeout(this.timer)
     }
     this.timer = setTimeout(() => {
-      logger.trace('start keep alive')
+      logger.trace('开始保活')
       void this.emitKeepAlive()
     }, this.interval)
   }
@@ -74,7 +74,7 @@ export class Keepalive {
       ...counters,
     })) as [object, unknown]
 
-    if (err) throw new Error('keep alive error', {cause: err})
+    if (err) throw new Error('保活失败', {cause: err})
     const bytes = prettyBytes(counters.bytes, {binary: true})
     logger.info(`保活成功，提供了 ${counters.hits} 个文件, 大小 ${bytes}`)
     this.cluster.counters.hits -= counters.hits
@@ -88,9 +88,9 @@ export class Keepalive {
       this.cluster.connect()
       await this.cluster.enable()
     })
-      .timeout(ms('10m'), 'restart timeout')
+      .timeout(ms('10m'), '重启超时')
       .catch((e) => {
-        logger.error(e, 'restart failed')
+        logger.error(e, '重启失败')
         this.cluster.exit(1)
       })
   }

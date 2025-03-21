@@ -184,7 +184,7 @@ export class Cluster {
     if (missingFiles.length === 0) {
       return
     }
-    logger.info(`mismatch ${missingFiles.length} files, start syncing`)
+    logger.info(`缺少 ${missingFiles.length} 个文件, 正在开始同步`)
     logger.info(syncConfig, '同步策略')
     const multibar = new MultiBar({
       format: ' {bar} | {filename} | {value}/{total}',
@@ -410,7 +410,7 @@ export class Cluster {
   public async listen(): Promise<void> {
     await new Promise<void>((resolve) => {
       if (!this.server) {
-        throw new Error('server not setup')
+        throw new Error('服务尚未初始化')
       }
       this.server.listen(this._port, resolve)
       logger.debug('端口已监听');
@@ -428,7 +428,7 @@ export class Cluster {
             cb({token})
           })
           .catch((e) => {
-            logger.error(e, 'get token error')
+            logger.error(e, '获取 Token 失败')
             this.exit(1)
           })
       },
@@ -438,10 +438,10 @@ export class Cluster {
       logger.info(msg)
     })
     this.socket.on('connect', () => {
-      logger.debug('connected')
+      logger.debug('已连接至主控')
     })
     this.socket.on('disconnect', (reason) => {
-      logger.warn(`与服务器断开连接: ${reason}`)
+      logger.warn(`与主控断开连接: ${reason}`)
       this.isEnabled = false
       this.keepalive.stop()
     })
@@ -525,7 +525,7 @@ export class Cluster {
         throw new Error('未连接到服务器');
     }
 
-    logger.debug('正在通过socket请求证书');
+    logger.debug('正在通过 socket 请求证书');
     const [err, cert] = (await this.socket.emitWithAck('request-cert')) as [object, {cert: string; key: string}];
 
     if (err) {
@@ -546,10 +546,10 @@ export class Cluster {
 
   public async useSelfCert(): Promise<void> {
     if (!config.sslCert) {
-      throw new Error('缺少ssl证书')
+      throw new Error('缺少 ssl 证书')
     }
     if (!config.sslKey) {
-      throw new Error('缺少ssl私钥')
+      throw new Error('缺少 ssl 私钥')
     }
 
     if (await fse.pathExists(config.sslCert)) {
@@ -629,12 +629,12 @@ export class Cluster {
       throw new Error('节点注册失败')
     }
 
-    logger.info(colors.rainbow('start doing my job'))
+    logger.info(colors.rainbow('开始提供服务'))
     this.keepalive.start(this.socket)
   }
 
   private onConnectionError(event: string, err: Error): void {
-    logger.error(`${event}: cannot connect to server`, err)
+    logger.error(`${event}: 无法连接至主控`, err)
     if (this.server) {
       this.server.close(() => {
         this.exit(1)

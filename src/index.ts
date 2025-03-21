@@ -37,8 +37,13 @@ function forkWorker(): void {
   // 监听退出
   worker.on('exit', (code, signal) => {
     if (process.env.RESTART_PROCESS === 'false') {
+      const delay = parseInt(process.env.EXIT_DELAY || '3', 10) * 1000
+
       // 不启用自动重启
-      logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, 正在退出进程`)      
+      logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`)  
+
+      // 延迟
+      setTimeout(() => {}, delay)       
     } else {
       // 如果启用自动重启
       const delay = process.env.ENABLE_EXIT_DELAY === 'true'

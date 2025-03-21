@@ -7,25 +7,34 @@
 
 ## 配置
 
-| 环境变量                | 必填 | 默认值          | 说明                                                                                                     |
-|---------------------|----|--------------|--------------------------------------------------------------------------------------------------------|
-| CLUSTER_ID          | 是  | -            | 集群 ID                                                                                                  |
-| CLUSTER_SECRET      | 是  | -            | 集群密钥                                                                                                   |
-| CLUSTER_IP          | 否  | 自动获取公网出口IP   | 用户访问时使用的 IP 或域名                                                                                        |
-| CLUSTER_PORT        | 否  | 4000         | 监听端口                                                                                                   |
-| CLUSTER_PUBLIC_PORT | 否  | CLUSTER_PORT | 对外端口                                                                                                   |
-| CLUSTER_BYOC        | 否  | false        | 是否使用自定义域名, (BYOC=Bring you own certificate),当使用国内服务器需要备案时, 需要启用这个参数来使用你自己的域名, 并且你需要自己提供ssl termination |
-| ENABLE_NGINX        | 否  | false        | 使用 nginx 提供文件服务                                                                                        |
-| DISABLE_ACCESS_LOG  | 否  | false        | 禁用访问日志输出                                                                                               |
-| ENABLE_UPNP         | 否  | false        | 启用 UPNP 端口映射                                                                                           |
-| SSL_KEY             | 否  | -            | (仅当开启BYOC时) SSL 证书私钥, 可以直接粘贴证书内容，也可以填写文件名                                                              |
-| SSL_CERT            | 否  | -            | (仅当开启BYOC时) SSL 证书公钥, 可以直接粘贴证书内容，也可以填写文件名                                                              |
-| RESTART_PROCESS | 否 | true | 在当前进程意外退出后调用自身功能自动重启进程 |
-| ENABLE_EXIT_DELAY | 否 | false | 使用自定义固定秒数而非内置退避策略的重启前等待时间 |
-| EXIT_DELAY | 否 | 3 | 在重启前进行自定义秒数的延迟 |
-| LOGLEVEL | 否 | info | 切换日志等级 |
+| 环境变量             | 必填 | 默认值             | 说明                                                                                                     |
+|---------------------|------|-------------------|----------------------------------------------------------------------------------------------------------|
+| CLUSTER_ID          |  是  | -                 | 集群 ID                                                                                                   |
+| CLUSTER_SECRET      |  是  | -                 | 集群密钥                                                                                                  |
+| CLUSTER_IP          |  否  | 自动获取公网出口IP  | 用户访问时使用的 IP 或域名                                                                                 |
+| CLUSTER_PORT        |  否  | 4000              | 监听端口                                                                                                  |
+| CLUSTER_PUBLIC_PORT |  否  | CLUSTER_PORT      | 对外端口                                                                                                  |
+| CLUSTER_BYOC        |  否  | false             | 是否使用自定义证书 (BYOC=Bring you own certificate, 当使用国内服务器需要备案时, 需要启用这个参数来使用你自己的带证书的域名, 需搭配下方SSL相关设置使用) |
+| SSL_KEY             |  否  | -                 | (仅当开启BYOC时) SSL 证书私钥, 可以直接粘贴证书内容，也可以填写文件名                                        |
+| SSL_CERT            |  否  | -                 | (仅当开启BYOC时) SSL 证书公钥, 可以直接粘贴证书内容，也可以填写文件名                                        |
+| ENABLE_NGINX        |  否  | false             | 使用 nginx 提供文件服务                                                                                   |
+| DISABLE_ACCESS_LOG  |  否  | false             | 禁用访问日志输出                                                                                          |
+| ENABLE_UPNP         |  否  | false             | 启用 UPNP 端口映射                                                                                       |
+| RESTART_PROCESS     |  否  | true              | 在当前进程意外退出后调用自身功能自动重启进程                                                                |
+| ENABLE_EXIT_DELAY   |  否  | false             | 使用自定义固定秒数而非内置退避策略的重启前等待时间                                                          |
+| EXIT_DELAY          |  否  | 3                 | 在重启/退出前进行自定义秒数的延迟                                                                          |
+| LOGLEVEL            |  否  | info              | 切换日志等级                                                                                             |
+| NO_DAEMON           |  否  | false             | 是否禁用子进程模式(推荐启用, 禁用后无法使用自动重启或退出前延迟功能)                                          |
 
 在部分低配机器上, 程序自身的自动重启功能可能导致重连出现问题(出现卡死等情况)，建议使用外置重启进程(如MCSM的自动重启功能), 在配置文件中将 RESTART_PROCESS 设为 false 即可关闭程序自身的重启功能
+
+若 RESTART_PROCESS 为 false, 则程序将不进行内置自动重启, 进程结束后程序将直接退出
+
+若 ENABLE_EXIT_DELAY 为 true, 则程序在重启前将使用自定义延迟
+
+若 EXIT_DELAY 未填写且 ENABLE_EXIT_DELAY 为 true, 则程序在重启前将读取预设值自动进行 3s 的延迟
+
+若 EXIT_DELAY 未填写且 RESTART_PROCESS 为 false, 则程序在退出前将读取预设值自动进行 3s 的延迟(禁用自动重启则退出前强制使用EXIT_DELAY值, 无视ENABLE_EXIT_DELAY的设置值)
 
 如果你在源码中发现了其他环境变量, 那么它们是为了方便开发而存在的, 可能会随时修改, 不要在生产环境中使用
 
