@@ -283,13 +283,24 @@ export class Cluster {
   }
 
   public setupExpress(https: boolean): Server {
+    morgan.token('datetime', () => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+      return `[${year}-${month}-${day} ${hours}:${minutes}:${seconds}]`;
+    });
     const app = http2Express(express)
     app.enable('trust proxy')
 
     app.get('/auth', AuthRouteFactory(config))
 
     if (!config.disableAccessLog) {
-      app.use(morgan('combined'))
+      app.use(morgan(':datetime [:remote-addr] :url → :status | :response-time ms | [:user-agent] HTTP/:http-version'));
     }
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     app.get('/download/:hash(\\w+)', async (req: Request, res: Response, next: NextFunction) => {
@@ -379,7 +390,7 @@ export class Cluster {
     await delay(ms('1s'))
 
     if (this.nginxProcess.exitCode !== null) {
-      throw new Error(`nginx exit with code ${this.nginxProcess.exitCode}`)
+      throw new Error(`Nginx 以 ${this.nginxProcess.exitCode} 退出码退出`)
     }
 
     const tail = new Tail(logFile)
@@ -395,7 +406,7 @@ export class Cluster {
     tail.on('line', (line: string) => {
       const match = line.match(logRegexp)
       if (!match) {
-        logger.debug(`cannot parse nginx log: ${line}`)
+        logger.debug(`无法解析 nginx 日志: ${line}`)
         return
       }
       this.counters.hits++
