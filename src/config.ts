@@ -26,6 +26,8 @@ export class Config {
   public readonly sslKey = env.get('SSL_KEY').asString()
   public readonly sslCert = env.get('SSL_CERT').asString()
 
+  public readonly restartProcess = env.get('RESTART_PROCESS').asBool()
+
   public readonly flavor: IConfigFlavor
 
   private constructor() {

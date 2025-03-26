@@ -75,13 +75,13 @@ export class Cluster {
 
   public constructor(
     private readonly clusterSecret: string,
-    private readonly version: string,
+    private readonly protocol_version: string,
     private readonly tokenManager: TokenManager,
   ) {
     this.host = config.clusterIp
     this._port = config.port
     this.publicPort = config.clusterPublicPort ?? config.port
-    this.ua = `openbmclapi-cluster/${version}`
+    this.ua = `openbmclapi-cluster/${protocol_version}`
     whiteListDomain.push(this.prefixUrl)
     this.got = got.extend({
       prefixUrl: this.prefixUrl,
@@ -454,13 +454,17 @@ export class Cluster {
 
     const io = this.socket.io
     io.on('reconnect', (attempt: number) => {
-      logger.info(`在重试${attempt}次后恢复连接`)
-      if (this.wantEnable) {
-        logger.info('正在尝试重新启用服务')
-        this.enable()
-          .then(() => logger.info('重试连接并且准备就绪'))
-          .catch(this.onConnectionError.bind(this, 'reconnect'))
+      if (config.restartProcess !== false) {
+        logger.info(`在重试${attempt}次后恢复连接`)
+        if (this.wantEnable) {
+          logger.info('正在尝试重新启用服务')
+          this.enable()
+            .then(() => logger.info('重试连接并且准备就绪'))
+            .catch(this.onConnectionError.bind(this, 'reconnect'))
+        }
       }
+      // 不启用自动重启
+      logger.info('已跳过重新启用服务');
     })
     io.on('reconnect_error', (err) => {
       logger.error(err, 'reconnect_error')
@@ -472,7 +476,7 @@ export class Cluster {
     await this.socket?.emitWithAck('port-check', {
       host: this.host,
       port: this.publicPort,
-      version: this.version,
+      version: this.protocol_version,
       byoc: config.byoc,
       noFastEnable: process.env.NO_FAST_ENABLE === 'true',
       flavor: config.flavor,
@@ -608,7 +612,7 @@ export class Cluster {
       const res = (await this.socket.timeout(ms('5m')).emitWithAck('enable', {
         host: this.host,
         port: this.publicPort,
-        version: this.version,
+        version: this.protocol_version,
         byoc: config.byoc,
         noFastEnable: process.env.NO_FAST_ENABLE === 'true',
         flavor: config.flavor,

@@ -42,13 +42,13 @@ async function createAndUploadFileToAlist(size: number): Promise<string> {
   return uploadUrl;
 }
 
-export async function bootstrap(version: string): Promise<void> {
+export async function bootstrap(version: string, protocol_version: string): Promise<void> {
   logger.info(colors.green(`Booting Node-OBA-Fix`));
-  logger.info(colors.green(`当前版本: 1.5.2`));
-  logger.info(colors.green(`协议版本: ${version}`));
-  const tokenManager = new TokenManager(config.clusterId, config.clusterSecret, version);
+  logger.info(colors.green(`当前版本: ${version}`));
+  logger.info(colors.green(`协议版本: ${protocol_version}`));
+  const tokenManager = new TokenManager(config.clusterId, config.clusterSecret, protocol_version);
   await tokenManager.getToken();
-  const cluster = new Cluster(config.clusterSecret, version, tokenManager);
+  const cluster = new Cluster(config.clusterSecret, protocol_version, tokenManager);
   await cluster.init();
   cluster.connect();
 
@@ -122,14 +122,14 @@ export async function bootstrap(version: string): Promise<void> {
     logger.info('请求上线');
     await cluster.enable();
 
-    logger.info(colors.rainbow(`done, serving ${files.files.length} files`));
+    logger.info(colors.rainbow(`节点启动完毕, 正在提供 ${files.files.length} 个文件`));
     if (nodeCluster.isWorker && typeof process.send === 'function') {
       process.send('ready');
     }
 
     checkFileInterval = setTimeout(() => {
       void checkFile(files).catch((e) => {
-        logger.error(e, 'check file error');
+        logger.error(e, '文件检查失败');
       });
     }, ms('10m'));
   } catch (e) {
@@ -142,7 +142,7 @@ export async function bootstrap(version: string): Promise<void> {
   }
 
   async function checkFile(lastFileList: IFileList): Promise<void> {
-    logger.debug('refresh files');
+    logger.debug('刷新文件中');
     try {
       const lastModified = max(lastFileList.files.map((file) => file.mtime));
       const fileList = await cluster.getFileList(lastModified);
@@ -156,7 +156,7 @@ export async function bootstrap(version: string): Promise<void> {
     } finally {
       checkFileInterval = setTimeout(() => {
         checkFile(lastFileList).catch((e) => {
-          logger.error(e, 'check file error');
+          logger.error(e, '文件检查失败');
         });
       }, ms('10m'));
     }
@@ -164,7 +164,7 @@ export async function bootstrap(version: string): Promise<void> {
 
   let stopping = false;
   const onStop = async (signal: string): Promise<void> => {
-    logger.info(`got ${signal}, unregistering cluster`);
+    logger.info(`收到 ${signal}, 正在注销节点`);
     if (stopping) {
       process.exit(1); // eslint-disable-line n/no-process-exit
     }

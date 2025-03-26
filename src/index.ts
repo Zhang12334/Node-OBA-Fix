@@ -7,6 +7,7 @@ import {bootstrap} from './bootstrap.js'
 import {logger} from './logger.js'
 
 const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8')) as {
+  protocol_version: string
   version: string
 }
 
@@ -15,7 +16,7 @@ config()
 
 // 如果以非守护进程模式运行，直接启动应用
 if (process.env.NO_DAEMON || !cluster.isPrimary) {
-  bootstrap(packageJson.version).catch((err) => {
+  bootstrap(packageJson.version, packageJson.protocol_version).catch((err) => {
     // eslint-disable-next-line no-console
     console.error(err)
     // eslint-disable-next-line n/no-process-exit
@@ -30,6 +31,7 @@ if (!process.env.NO_DAEMON && cluster.isPrimary) {
 
 const BACKOFF_FACTOR = 2
 let backoff = 1
+let isExiting = false
 
 function forkWorker(): void {
   const worker = cluster.fork()
@@ -37,15 +39,16 @@ function forkWorker(): void {
   // 监听退出
   worker.on('exit', (code, signal) => {
     if (process.env.RESTART_PROCESS === 'false') {
-      const delay = parseInt(process.env.EXIT_DELAY || '3', 10) * 1000
-
       // 不启用自动重启
+      const delay = parseInt(process.env.EXIT_DELAY || '3', 10) * 1000
+      isExiting = true
+
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`)  
 
       // 延迟
       setTimeout(() => {}, delay)       
     } else {
-      // 如果启用自动重启
+      // 启用自动重启
       const delay = process.env.ENABLE_EXIT_DELAY === 'true'
         ? parseInt(process.env.EXIT_DELAY || '3', 10) * 1000 // 使用自定义延迟时间
         : backoff * 1000 // 使用退避策略
@@ -66,22 +69,30 @@ function forkWorker(): void {
     }
   })
 
-  // 定义进程关闭逻辑
   function onStop(signal: string): void {
+    if (isExiting) {
+      logger.warn('正在强制退出...')
+      process.exit(1)
+    }
+  
+    isExiting = true
+    process.off('SIGINT', onStop)
+    process.off('SIGTERM', onStop)
+  
     worker.removeAllListeners('exit')
     worker.kill(signal)
-    worker.on('exit', () => {
-      // eslint-disable-next-line n/no-process-exit
+  
+    const forceExitTimer = setTimeout(() => {
+      logger.warn('退出超时, 正在强制退出...')
+      process.exit(1)
+    }, ms('30s')).unref()
+  
+    worker.once('exit', () => {
+      clearTimeout(forceExitTimer)
       process.exit(0)
     })
-    const ref = setTimeout(() => {
-      // eslint-disable-next-line n/no-process-exit
-      process.exit(0)
-    }, ms('30s'))
-    ref.unref()
   }
-
-  // 监听 SIGINT 和 SIGTERM 信号
+  
   process.on('SIGINT', onStop)
   process.on('SIGTERM', onStop)
 }
