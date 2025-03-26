@@ -3,7 +3,7 @@ import colors from 'colors/safe.js';
 import { HTTPError } from 'got';
 import { max } from 'lodash-es';
 import ms from 'ms';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { Cluster } from './cluster.js';
 import { config } from './config.js';
@@ -11,11 +11,26 @@ import { logger } from './logger.js';
 import { TokenManager } from './token.js';
 import { IFileList } from './types.js';
 import got from 'got';
+import fs from 'fs-extra';
 
 const davStorageUrl = process.env.CLUSTER_STORAGE_OPTIONS ? JSON.parse(process.env.CLUSTER_STORAGE_OPTIONS) : {};
 const davBaseUrl = `${davStorageUrl.url}/${davStorageUrl.basePath}`;
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const storageType = process.env.CLUSTER_STORAGE || 'file'; // 检查存储类型
+const startuplimit = parseInt(process.env.STARTUP_LIMIT || '90', 10);
+const STARTUP_LIMIT_WAIT_TIMEOUT = parseInt(process.env.STARTUP_LIMIT_WAIT_TIMEOUT || '600', 10);
+
+// 检查上线次数是否超过限制
+function isExceedLimit(startupTimes: number[], limit: number): boolean {
+  return startupTimes.length > limit;
+}
+
+// 删除超过 24 小时的上线记录
+function filterRecentStartupTimes(startupTimes: number[]): number[] {
+  const now = Date.now();
+  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+  return startupTimes.filter((timestamp) => now - timestamp <= twentyFourHoursInMs);
+}
 
 async function createAndUploadFileToAlist(size: number): Promise<string> {
   const content = Buffer.alloc(size * 1024 * 1024, '0066ccff', 'hex');
@@ -46,6 +61,75 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   logger.info(colors.green(`Booting Node-OBA-Fix`));
   logger.info(colors.green(`当前版本: ${version}`));
   logger.info(colors.green(`协议版本: ${protocol_version}`));
+
+  const startupFilePath = join('data', 'startup.json');
+
+  // 确保 data 目录存在
+  await fs.ensureDir(dirname(startupFilePath));
+
+  // 读取 startup.json 文件，不存在则初始化
+  let startupTimes: number[] = [];
+  if (await fs.pathExists(startupFilePath)) {
+    const data = await fs.readFile(startupFilePath, 'utf-8');
+    startupTimes = JSON.parse(data);
+  }
+
+  // 删除超过 24 小时的上线记录
+  startupTimes = filterRecentStartupTimes(startupTimes);
+
+  // 保存更新后的上线记录
+  await fs.writeFile(startupFilePath, JSON.stringify(startupTimes, null, 2), 'utf-8');
+
+  // 检查上线次数是否超过限制
+  if (isExceedLimit(startupTimes, startuplimit)) {
+    logger.warn(`24h 内启动次数超过 ${startuplimit} 次, 继续启动有被主控封禁的风险, 请输入 yes 进行强制启动`);
+    logger.warn(`当前 24h 内启动次数为 ${startupTimes.length} 次`);
+    // 创建一个 Promise，等待用户输入或超时
+    const answer = await Promise.race([
+      new Promise<string>((resolve) => {
+        process.stdin.once('data', (data) => resolve(data.toString().trim()));
+      }),
+      new Promise<string>((resolve) => {
+        setTimeout(() => resolve('timeout'), STARTUP_LIMIT_WAIT_TIMEOUT*1000);
+      }),
+    ]);
+
+    if (answer === 'timeout') {
+      // 如果超时，则隔一段时间再检查一次是否超限
+      logger.warn(`等待回复超时, ${STARTUP_LIMIT_WAIT_TIMEOUT} 秒后再次检测是否超限`);
+    
+      // 封装为promise
+      const checkLimitPromise = new Promise<void>((resolve, reject) => {
+        const interval = setInterval(async () => {
+          // 读取
+          const data = await fs.readFile(startupFilePath, 'utf-8');
+          startupTimes = JSON.parse(data);
+          // 删除超过 24 小时的上线记录
+          startupTimes = filterRecentStartupTimes(startupTimes);
+          // 再次判断是否超限
+          if (isExceedLimit(startupTimes, startuplimit)) {
+            logger.warn(`24h 内上线次数超过 ${startuplimit} 次, 已取消启动`);
+            clearInterval(interval); // 停止定时器
+            reject(new Error('启动次数超限')); // 拒绝 Promise
+          } else {
+            resolve(); // 检查通过，启动!
+          }
+        }, STARTUP_LIMIT_WAIT_TIMEOUT*1000);
+      });
+    
+      try {
+        // 等待定时器的检查结果
+        await checkLimitPromise;
+      } catch (error) {
+        // 超限，退出程序
+        process.exit(1);
+      }
+    } else if (answer.toLowerCase() !== 'yes') {
+      logger.warn(`24h 内上线次数超过 ${startuplimit} 次, 已取消启动`);
+      process.exit(1);
+    }
+  }
+  
   const tokenManager = new TokenManager(config.clusterId, config.clusterSecret, protocol_version);
   await tokenManager.getToken();
   const cluster = new Cluster(config.clusterSecret, protocol_version, tokenManager);

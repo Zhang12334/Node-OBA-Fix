@@ -616,6 +616,28 @@ export class Cluster {
   private async _enable(): Promise<void> {
     let err: unknown
     let ack: unknown
+
+    // 写入时间戳
+    const timestamp = Date.now(); // 数字毫秒级时间戳
+    const filePath = join(__dirname, '../data/startup.json');
+    try {
+      // 读
+      let startupTimes: number[] = [];
+      if (await fse.pathExists(filePath)) {
+        const data = await fse.readFile(filePath, 'utf-8');
+        startupTimes = JSON.parse(data);
+      }
+    
+      // 添加当前时间戳
+      startupTimes.push(timestamp);
+    
+      // 写
+      await fse.writeFile(filePath, JSON.stringify(startupTimes, null, 2), 'utf-8');
+    } catch (e) {
+      // 爆!
+      logger.error('写入启动时间戳失败', e);
+    }
+
     if (!this.socket) {
       throw new Error('未连接到服务器')
     }
