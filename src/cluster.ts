@@ -476,6 +476,7 @@ export class Cluster {
       }
       // 不启用自动重启
       logger.info('已跳过重新启用服务');
+      this.exit(1)
     })
     io.on('reconnect_error', (err) => {
       logger.error(err, 'reconnect_error')
