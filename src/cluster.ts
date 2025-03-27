@@ -589,16 +589,15 @@ export class Cluster {
   }
 
   public gcBackground(files: IFileList): void {
-    // 规范化 measure 文件夹路径
     const measurePath = normalize('measure/');
   
-    // 过滤掉 measure 目录中的文件
+    // 过滤掉 measure
     const filteredFiles = files.files.filter((file) => {
       const relativePath = relative(measurePath, file.path);
-      return relativePath.startsWith('..'); // 如果文件不在 measure 内，返回 true
+      return relativePath.startsWith('..'); // 如果文件不在 measure 内，返回
     });
   
-    // 调用存储的 gc 方法处理过滤后的文件
+    // GC过滤后的文件
     this.storage
       .gc(filteredFiles)
       .then((res) => {
@@ -617,9 +616,7 @@ export class Cluster {
   private async _enable(): Promise<void> {
     let err: unknown
     let ack: unknown
-
-    // 写入时间戳
-    const timestamp = Date.now(); // 数字毫秒级时间戳
+    const timestamp = Date.now();
     const filePath = join(__dirname, '../data/startup.json');
     try {
       // 读
@@ -629,7 +626,7 @@ export class Cluster {
         startupTimes = JSON.parse(data);
       }
     
-      // 添加当前时间戳
+      // 加
       startupTimes.push(timestamp);
     
       // 写
