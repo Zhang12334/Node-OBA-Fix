@@ -1,10 +1,16 @@
 import dotenv from 'dotenv'
 import {z} from 'zod'
 import env from 'env-var'
+import {readFileSync} from 'fs'
+import {fileURLToPath} from 'url'
 
 export interface IConfigFlavor {
   runtime: string
   storage: string
+}
+const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8')) as {
+  protocol_version: string
+  version: string
 }
 
 export class Config {
@@ -30,6 +36,8 @@ export class Config {
   public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
   public readonly flavor: IConfigFlavor
 
+  public readonly protocol_version = packageJson.protocol_version
+  public readonly version = packageJson.version
   private constructor() {
     this.flavor = {
       runtime: `Node.js/${process.version}`,

@@ -203,26 +203,32 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   cluster.gcBackground(files);
 
   let checkFileInterval: NodeJS.Timeout;
-  try {
-    logger.info('请求上线');
-    await cluster.enable();
+  if (config.noENABLE === true) {
+    logger.info('节点上线功能已禁用');
+    logger.info('节点上线功能已禁用');
+    logger.info('节点上线功能已禁用');
+  } else {
+    try {
+      logger.info('请求上线');
+      await cluster.enable();
 
-    logger.info(colors.rainbow(`节点启动完毕, 正在提供 ${files.files.length} 个文件`));
-    if (nodeCluster.isWorker && typeof process.send === 'function') {
-      process.send('ready');
-    }
+      logger.info(colors.rainbow(`节点启动完毕, 正在提供 ${files.files.length} 个文件`));
+      if (nodeCluster.isWorker && typeof process.send === 'function') {
+        process.send('ready');
+      }
 
-    checkFileInterval = setTimeout(() => {
-      void checkFile(files).catch((e) => {
-        logger.error(e, '文件检查失败');
-      });
-    }, ms('10m'));
-  } catch (e) {
-    logger.fatal(e);
-    if (process.env.NODE_ENV === 'development') {
-      logger.fatal('调试模式已开启, 不进行退出');
-    } else {
-      cluster.exit(1);
+      checkFileInterval = setTimeout(() => {
+        void checkFile(files).catch((e) => {
+          logger.error(e, '文件检查失败');
+        });
+      }, ms('10m'));
+    } catch (e) {
+      logger.fatal(e);
+      if (process.env.NODE_ENV === 'development') {
+        logger.fatal('调试模式已开启, 不进行退出');
+      } else {
+        cluster.exit(1);
+      }
     }
   }
 

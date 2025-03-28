@@ -40,6 +40,7 @@ import type {TokenManager} from './token.js'
 import type {IFileList} from './types.js'
 import {setupUpnp} from './upnp.js'
 import {checkSign, hashToFilename} from './util.js'
+import { aplPanelListener, aplPanelServe } from './dashboard/main.js';
 
 interface ICounters {
   hits: number
@@ -303,6 +304,7 @@ export class Cluster {
       app.use(morgan(':datetime [:remote-addr] :url → :status | :response-time ms | [:user-agent] HTTP/:http-version'));
     }
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    aplPanelServe(app, this.storage);
     app.get('/download/:hash(\\w+)', async (req: Request, res: Response, next: NextFunction) => {
       try {
         const hash = req.params.hash.toLowerCase()
@@ -327,6 +329,7 @@ export class Cluster {
         }
         res.set('x-bmclapi-hash', hash)
         const {bytes, hits} = await this.storage.express(hashPath, req, res, next)
+        aplPanelListener(req, bytes, hits);
         this.counters.bytes += bytes
         this.counters.hits += hits
       } catch (err) {

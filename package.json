@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "test": "true",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc && copyfiles -u 1 src/dashboard/**/* dist/",
     "dev": "tsc-watch --onSuccess \"node --enable-source-maps dist/index.js\"",
     "lint": "eslint .",
     "prepare": "husky || true"
