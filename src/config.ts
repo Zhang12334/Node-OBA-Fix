@@ -27,7 +27,7 @@ export class Config {
   public readonly sslCert = env.get('SSL_CERT').asString()
 
   public readonly restartProcess = env.get('RESTART_PROCESS').asBool()
-
+  public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
   public readonly flavor: IConfigFlavor
 
   private constructor() {
