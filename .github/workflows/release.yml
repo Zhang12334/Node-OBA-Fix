@@ -33,7 +33,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - run: npm i
+      - run: npm i --no-package-lock
       - run: npm run build
 
       ## Linux & MacOS
