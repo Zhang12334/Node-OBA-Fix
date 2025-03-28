@@ -52,7 +52,7 @@ function forkWorker(): void {
     } else {
       // 启用自动重启
       const delay = process.env.ENABLE_EXIT_DELAY === 'true'
-        ? parseInt(process.env.EXIT_DELAY || '3', 10) * 1000 // 使用自定义延迟时间
+        ? parseInt(process.env.EXIT_DELAY || '3', 10) * 1000 // 使用自定义延迟退出时间
         : backoff * 1000 // 使用退避策略
 
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`)
