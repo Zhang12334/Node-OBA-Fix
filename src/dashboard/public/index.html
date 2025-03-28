@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>OpenBMCLAPI Dashboard</title>
+		<meta name="description" content="OpenBMCLAPI Dashboard">
+		
+		<link rel="icon" href="./logo.png">
+		<link rel="manifest" href="./manifest.json">
+
+		<meta name="theme-color" content="#202124">
+		<link rel="stylesheet" href="./cake/cakeL.css">
+		<link rel="stylesheet" href="./layout.css">
+		<link rel="stylesheet" href="./switchtopc.css">
+		<script type="text/javascript" src="./switchtopc.js" defer></script>
+		<script type="text/javascript" src="./echarts.min.js" defer></script>
+		<script type="text/javascript" src="./ui.js" defer></script>
+		<script type="text/javascript" src="./f12.js" defer></script>					
+	</head>
+
+	<body>
+		<div id="pc-mode-alert" class="pc-alert">
+			<div class="alert-content">
+			  <h1>为获得最佳体验, 建议使用PC端或PC模式访问</h1>
+			  <div class="alert-buttons">
+				<button id="continue-mobile">继续使用移动端</button>
+			  </div>
+			</div>
+		  </div>
+		<div class="topBar container">
+			<img src="logo.png" alt="Logo" class="logo" />
+			<h2 class="title">Node OpenBMCLAPI Fix Dashboard</h2>
+			<!-- 右侧数据显示 -->
+			<div class="statsInfo">
+				<div class="statsInfo">
+					<span class="stats-label">节点已连续运行</span>
+					<span class="statsRunTime"></span>
+				</div>
+				<div class="stats-divider">|</div>
+				<div class="statsInfo">
+					<span class="stats-label">接受了</span>
+					<span class="statsTotal"></span>
+					<span class="stats-unit">次请求</span>
+				</div>
+				<div class="stats-divider">|</div>
+				<div class="statsInfo">
+					<span class="stats-label">提供了</span>
+					<span class="statsTotalTraffic"></span>
+					<span class="stats-unit">流量</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="layout">
+				<div class="main">
+					<h3>当日请求</h3>
+					<div id="chart_stats_rv_hour" class="chart"></div>
+					<h3>当月请求</h3>
+					<div id="chart_stats_rv_day" class="chart"></div>
+					<h3>当年请求</h3>
+					<div id="chart_stats_rv_month" class="chart"></div>
+					<h3>热力图</h3>
+					<div id="chart_stats_rv_heatmap" class="chart"></div>
+				</div>
+			</div>
+			<div class="ua-ip-container">
+				<!-- 左栏 -->
+				<div class="left">
+					<div class="text-section">
+						<h3>请求UA占比</h3>
+					</div>
+					<div id="chart_stats_device" class="chart"></div>
+				</div>
+				<!-- 右栏 -->
+				<div class="right">
+					<div class="text-section">
+						<h3>请求IP类型</h3>
+					</div>
+					<div id="chart_stats_network_type" class="chart"></div>
+				</div>
+			</div>
+
+		</div>
+		<footer class="dashboard-footer">
+			<div class="footer-bottom">
+				<a href="https://github.com/Zhang12334/Node-OBA-Fix" target="_blank" class="footer-logo-link">
+					<img src="logo.png" alt="FooterLogo" class="FooterLogo" />
+				  </a>
+				  <p>
+					<a href="https://github.com/Zhang12334/Node-OBA-Fix" target="_blank" class="footer-link">
+					  Node OpenBMCLAPI Fix
+					</a> |
+					<span>
+						<a href="https://github.com/Zhang12334/Node-OBA-Fix/releases/latest" target="_blank" class="footer-link">
+							版本 <span class="footerVersion"></span>
+						</a>
+					</span> |
+					<span>运行时间 <span class="footerRunTime"></span></span>
+				  </p>								
+			</div>
+		</footer>	  
+	</body>
+</html>

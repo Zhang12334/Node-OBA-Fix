@@ -84,8 +84,6 @@ config.js
 !public/alipay-red-envelope.png
 !public/libraries
 
-public/
-
 
 /*.heapsnapshot
 /doc

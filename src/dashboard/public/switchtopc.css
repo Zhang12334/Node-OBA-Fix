@@ -1,0 +1,54 @@
+/* 提示框样式 */
+.pc-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.alert-content {
+  background: var(--dark);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+  border: 1px solid var(--primary);
+}
+
+.alert-content p {
+  color: var(--light);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+#continue-mobile {
+  background: var(--primary);
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.2s;
+}
+
+#continue-mobile:active {
+  transform: scale(0.98);
+}
+
+/* 平板设备不显示提示 */
+@media (min-width: 768px) {
+  .pc-alert {
+    display: none !important;
+  }
+}

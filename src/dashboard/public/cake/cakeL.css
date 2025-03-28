@@ -1,0 +1,206 @@
+/*字体!!*/
+@font-face {
+	font-family: 'HarmonyOS';
+	font-display: swap;
+	src: url('./HarmonyOS_Sans_SC_Medium.subset.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'JetBrainsMono';
+	font-display: swap;
+	src: url('./JetBrainsMono-Regular.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Ubuntu_and_JetBrainsMono';
+	font-display: swap;
+	src: url('./Ubuntu-Regular.subset.woff2?v=2') format('woff2'),
+		 local("JetBrainsMono");
+	word-spacing: -5px; /*等宽空格间距太大*/
+}
+
+
+body {
+	--c: #06B0FF;  /*蓝色*/
+	--cT: #5dccff17;  /*半透明+蓝色*/
+	--e: #ff8c00;  /*橙色*/
+	--g: #20FF02;  /*绿色*/
+	--t: #7F7F7F80;  /*半透明灰色*/
+	--greyAuto: #7F7F7F;  /*不透明灰色*/
+
+	background-color: var(--a0);  /*自适应颜色*/
+
+	min-height: 100vh;
+}
+
+/*布局*/
+*, *::before {box-sizing: border-box}
+* {scroll-behavior: smooth}
+body, html {margin: 0}
+
+* {transition: all .2s ease}
+/* .--no-transition, .--no-transition * {transition: all 0s} */
+
+/*滚动条*/
+::-webkit-scrollbar {width: 6px; height: 6px}
+::-webkit-scrollbar-thumb {background: #62626280}
+::-webkit-scrollbar-thumb:hover {background: #62626260}
+::-webkit-scrollbar-thumb:active {background: #62626270}
+/*火狐*/
+* {scrollbar-width: thin; scrollbar-color: #333 transparent}
+
+/*文本*/
+body {line-height: 1.4; word-break: break-word}
+body, pre, code, input, textarea, .no-cake-title-font { /* 正文字体 */
+	font-family: 'JetBrainsMono', 'PingFang SC', 'HarmonyOS', 'Segoe UI Emoji';
+	color: var(--a1);
+}
+h1, h2, h3, h4, h5, h6, .btn{  /*标题&按钮字体*/
+	margin: 0 0 7px 0;  font-family: 'Ubuntu_and_JetBrainsMono', 'HarmonyOS', 'Trebuchet MS', 'Segoe UI Emoji';
+}
+
+p{
+	margin: 15px 0;
+	font-size: 15px;
+}
+li{
+	margin: 10px 0;
+	font-size: 15px;
+}
+p:last-child {margin-bottom: 0}
+hr {border: none; height: 1px; background-color: var(--t)}
+a {color: var(--c); text-decoration: none; word-wrap: break-word}
+a.-ui:hover {text-decoration: none; background-color: var(--cT)}
+h1, h2, h3, h4 {font-weight: 500}
+h1 {font-size: 2rem}
+h2 {font-size: 1.5rem}
+del {text-decoration: line-through 2px}
+
+/*选中文本高亮*/
+::selection {background: #34beff33}
+
+/*浮动*/
+.center {text-align: center} /*居中*/
+.left {float: left}
+.right {float: right}
+.clear, br {clear: both}
+
+/*删除边距*/
+.-mBottom {margin-bottom: 0!important; padding-bottom: 0!important}
+.-mTop {margin-top: 0!important; padding-top: 0!important}
+
+/*盒子*/
+.box {
+	width: 100%;
+	padding: 24px;
+	box-shadow: 0 15px 35px rgb(50 50 93 / 10%), 0 5px 15px rgb(0 0 0 / 7%);
+	background-color: var(--a0);
+	/* transition: all .3s ease, border-top 1s ease, border-top 0s; */
+}
+
+/*按钮*/
+.btn {
+	padding: 0 10px;
+	height: 27px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 15px 35px rgb(50 50 93 / 10%), 0 5px 15px rgb(0 0 0 / 7%);
+	transition: all .4s ease;
+}
+.btn.square{width: 27px}
+.btn:active {filter: brightness(85%)}
+.btn.-quit{--c: var(--grey)}
+.btn.-ful{--c: var(--e)}
+
+/*图片*/
+img {-webkit-user-drag: none}
+
+/*自适应*/
+.container {
+	padding: 0 140px;
+}
+
+@media(max-width: 1590px) {
+	.container {
+		padding: 0 45px;
+	}
+}
+@media(min-width: 1920px){
+	.container_center_limit {
+		margin: auto;
+		max-width: 1474px;
+	}
+}
+
+
+@media (prefers-color-scheme: light) { /*浅色*/
+	body {
+		--a0: #f7f7f7;
+		--a1: #162838;
+		--grey: #606060;
+	}
+
+	.-shadow{
+		box-shadow: 0 15px 35px rgb(50 50 93 / 10%), 0 5px 15px rgb(0 0 0 / 7%);
+	}
+
+	.box {
+		border-top: 3px solid var(--c);
+		border-bottom: none;
+	}
+
+	.btn {
+		border: none;
+		color: #fff;
+		background-color: var(--c);
+	}
+	.btn:not[-nobtn]:hover {filter: brightness(115%)}
+	.btn.-open {background-color: var(--e)}
+	.btn.-nobtn{
+		background-color: var(--a0);
+		color: var(--a1);
+	}
+
+	.cake-background{
+		background-image: repeating-linear-gradient(135deg, #5dccff0f, #5dccff0f 4rem, transparent 0, transparent 8rem);
+	}
+}
+
+@media (prefers-color-scheme: dark) { /*深色*/
+	body {
+		--a0: #0d1118;
+		--a1: #adb4bc;
+		--grey: #343434;
+	}
+
+	.-shadow{
+		box-shadow: none;
+	}
+
+	.box {
+		border: 1px solid var(--t);
+		box-shadow: none;
+	}
+	.box:hover, .box.-inte {border: 1px solid var(--c)}
+
+	.btn {
+		border: 1px solid var(--c);
+		color: var(--a1);
+		background: transparent;
+		background-color: var(--a0);
+		box-shadow: none;
+	}
+	.btn:not[-nobtn]:hover {border-color: var(--c)}
+	.btn.-open {border-color: var(--e)}
+	.btn.-nobtn{
+		border: 1px solid var(--t);
+	}
+
+	.cake-background{
+		background-image: repeating-linear-gradient(135deg, #2752660f, #2752660f 4rem, transparent 0, transparent 8rem);
+	}
+}
+
+/*按钮*/
+.-link:hover{background-color: var(--cT);}
+
+

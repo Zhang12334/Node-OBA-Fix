@@ -1,0 +1,461 @@
+/* openbmclapi-dashboard.css */
+:root {
+	user-select: none; /* 禁止框选文本 */
+	--primary: #5e72e4;    /* 主色调-科技蓝 */
+	--secondary: #11cdef;  /* 辅助色-亮青 */
+	--success: #2dce89;    /* 成功色 */
+	--dark: #1a1a2e;       /* 深色背景 */
+	--light: #f8f9fe;      /* 浅色文本 */
+	--chart-bg: #25294a;   /* 图表背景 */
+  }
+  
+
+  
+/* 响应式缩放体系 */
+@media (max-width: 1600px) {
+	:root { font-size: 15px; }
+	.chart { height: 380px !important; }
+  }
+  
+  @media (max-width: 1400px) {
+	:root { font-size: 14px; }
+	.chart { height: 360px !important; }
+	#chart_stats_rv_heatmap .heatmap > div {
+	  width: clamp(6px, 2.8vw, 28px);
+	  height: clamp(6px, 2.8vw, 28px);
+	}
+  }
+  
+  @media (max-width: 1200px) {
+	:root { font-size: 13px; }
+	.chart { height: 340px !important; }
+	.topBar .title { font-size: 1.5rem; }
+	.main { padding-top: 2rem; }
+  }
+  
+  @media (max-width: 992px) {
+	:root { font-size: 12px; }
+	.chart { height: 300px !important; }
+	#chart_stats_rv_heatmap .heatmap > div {
+	  width: clamp(5px, 2.5vw, 25px);
+	  height: clamp(5px, 2.5vw, 25px);
+	}
+	.main { padding-top: 2rem; }
+  }
+  
+  @media (max-width: 880px) {
+	:root { font-size: 10px; }
+	.chart { height: 280px !important; }
+	#chart_stats_rv_heatmap .heatmap > div {
+	  width: clamp(4px, 2vw, 20px);
+	  height: clamp(4px, 2vw, 20px);
+	}
+	.main { padding-top: 4rem; }
+  }
+  
+  @media (max-width: 770px) {
+    .topBar .title {
+        display: none;
+    }
+    .chart { height: 260px !important; }
+    .layout { padding: 0 1rem; padding-top: 6rem; }
+	.main { padding-top: 5rem; }
+}
+  
+@media (max-width: 480px) {
+	:root { font-size: 9px; }
+	.chart { height: 200px !important; }
+	#chart_stats_rv_heatmap .heatmap > div {
+	  width: clamp(4px, 2vw, 20px);
+	  height: clamp(4px, 2vw, 20px);
+	}
+	.main { padding-top: 9rem; }
+}
+
+@media (max-width: 435px) {
+	:root { font-size: 7px; }
+}
+
+@media (max-width: 355px) {
+	:root { font-size: 5px; }
+}
+
+  /* 基础样式重置 */
+  body {
+	background: var(--dark);
+	color: var(--light);
+	font-family: 'Inter', system-ui, sans-serif;
+	line-height: 1.6;
+	overflow-x: hidden;
+  }
+  
+        /* 顶部导航栏  */
+        .topBar {
+            background: linear-gradient(45deg, var(--primary), #825ee4);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            z-index: 100;
+            width: 100%;
+            box-sizing: border-box;
+            left: 0;
+            top: 0;
+            display: flex;
+            justify-content: flex-start; /* 左对齐 */
+            align-items: center;
+        }
+
+        .topBar .title {
+			align-items: center;    /* 垂直居中 */
+            font-weight: 700;
+            font-size: 1.75rem;
+            letter-spacing: -0.025em;
+            margin: 0;
+            background: linear-gradient(to right, #fff 20%, var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+/* 统计信息容器 */
+.statsInfo {
+    display: flex;
+    flex-wrap: wrap; /* 允许换行 */
+    justify-content: flex-end; /* 整体靠右 */
+    align-items: baseline;
+    gap: 0.8rem;
+    margin-left: auto; /* 右侧对齐 */
+    max-width: 100%; /* 防止溢出 */
+    font-size: 1rem;
+    color: var(--light);
+    align-items: center;    /* 垂直居中 */	
+}
+
+/* 单个统计项 */
+.statsInfo > div {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    white-space: nowrap; /* 防止项内换行 */
+}
+
+/* 分隔符样式 */
+.stats-divider {
+    opacity: 0.6;
+    user-select: none;
+    display: inline-block; /* 保持水平排列 */
+}
+
+/* 数值标签样式 */
+.statsRunTime,
+.statsTotal,
+.statsTotalTraffic {
+    font-weight: bold;
+    color: var(--secondary);
+    min-width: 1.2em; /* 防止数值折叠 */
+}
+
+/* 自动换行保护 */
+@media (hover: none) {
+    .statsInfo {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .statsInfo::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* 加载状态指示器 */
+.topBar.--loading::after {
+    content: "";
+    /* 使用 absolute 相对于 topBar 定位 */
+    position: absolute; 
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--secondary);
+    animation: loading 1.5s infinite;
+    /* 设置宽度为 100%，使其占满 topBar 的宽度 */
+    width: 100%; 
+}
+  
+.logo {
+    width: 60px; /* 设置 logo 的宽度 */
+    height: 60px; /* 设置 logo 的高度 */
+    object-fit: contain; /* 确保 logo 保持比例 */
+}
+
+  /* 图表容器  */
+  .chart {
+	background: var(--chart-bg);
+	border-radius: 12px;
+	padding: 1.5rem;
+	margin: 1.5rem 0;
+	box-shadow: 0 7px 30px rgba(0,0,0,0.2);
+	transition: transform 0.3s ease;
+	height: 400px; /* 确保有明确的高度 */
+  }
+  
+  .chart:hover {
+	transform: translateY(-5px);
+  }
+  
+/* 响应式布局  */
+.layout {
+    padding: 0 2rem;
+    padding-top: 7rem;	
+}
+
+.main {
+	    /* 修改为单栏布局 */
+		display: block; 
+}
+  
+  @media (max-width: 3200px) {
+	.layout {
+	  grid-template-columns: 1fr;
+	}
+  }
+  
+
+/* 响应式适配：小于 1100px 时切换为上下布局 */
+@media (max-width: 1100px) {
+    .ua-ip-container {
+        flex-direction: column; /* 切换为垂直布局 */
+        gap: 1rem; /* 减少间距 */
+    }
+
+    .ua-ip-container .left {
+        min-width: 100%; /* 确保子容器占满宽度 */
+		padding: 1rem 2rem 0;
+    }
+
+    .ua-ip-container .right {
+        min-width: 100%; /* 确保子容器占满宽度 */
+		padding: 1rem 2rem 0;
+    }
+
+}
+
+
+/* 父容器 */
+.ua-ip-container {
+    display: flex;
+    gap: 2rem;       /* 分栏间距 */
+    flex-wrap: wrap;  /* 允许换行 */
+    align-items: flex-start; /* 顶部对齐 */
+	width: 100%;     /* 确保宽度占满父容器 */
+    max-width: 100%; /* 防止超出父容器宽度 */
+}
+
+/* 左右分栏容器 */
+.ua-ip-container > div {
+    flex: 1 1 300px; /* 允许伸缩 */
+    min-width: 300px; /* 最小宽度 */
+    padding: 1rem 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;       /* 上下区域间距 */
+}
+
+/* 文本容器优化 */
+.ua-ip-container .text-section {
+    display: flex;
+    align-items: center;    /* 垂直居中 */
+    justify-content: center;/* 水平居中 */
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: -1rem;   /* 抵消gap间距 */
+}
+
+  #chart_stats_rv_heatmap {
+    padding: 1rem;
+    /* 移除 overflow-x: auto，避免出现左右滑动条 */
+    display: flex;
+    justify-content: center;
+    height: auto;
+    background: var(--chart-bg); /* 使用图表背景色 */
+
+    /* 热力图容器 */
+    .heatmap {
+        display: flex;
+        flex-direction: row; /* 改为横向排列  */
+        flex-wrap: wrap;
+        gap: 3px; /* 替代margin间距  */
+        width: fit-content;
+        height: auto;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.1); /* 使用半透明白色背景，与整体风格协调 */
+        border-radius: 8px;
+        /* 添加相对定位，确保悬浮框的绝对定位相对于此容器 */
+        position: relative;
+    }
+
+    /* 悬浮提示优化 */
+    .floating {
+        position: absolute;
+        width: max-content;
+        height: fit-content;
+        z-index: 1;
+        bottom: 0;
+        /* 添加 left: 50% 使悬浮框水平居中 */
+        left: 50%;
+        transform: translate(-50%, -40px);
+        background: rgba(0, 0, 0, 0.85); /* 更深的半透明背景  */
+        color: var(--light); /* 使用浅色文本颜色 */
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 8px;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* 添加阴影层次  */
+        backdrop-filter: blur(4px); /* 毛玻璃效果  */
+        border: 1px solid rgba(255, 255, 255, 0.1); /* 添加微边框 */
+
+        &:not(.--join) {
+            opacity: 0;
+        }
+    }
+
+    /* 单个色块 */
+    .heatmap > div {
+        /* 使用 clamp() 动态调整方块大小 */
+        width: clamp(0.1px, 1.9vw, 30px);  /* 最小 1px，最大 40px，根据视口宽度动态调整 */
+        height: clamp(0.1px, 1.9vw, 30px); /* 与宽度保持一致 */
+        border-radius: 3px;
+        position: relative;
+        transition: 
+            transform 0.2s ease, 
+            opacity 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.15);
+            z-index: 2;
+        }
+
+        /* 颜色梯度优化 */
+        &.lv-0 { background: rgba(255, 255, 255, 0.1); }
+        &.lv-1 { background: rgba(45, 206, 137, 0.3); }
+        &.lv-2 { background: rgba(45, 206, 137, 0.6); }
+        &.lv-3 { background: var(--success); }
+        &.lv-4 { background: rgba(25, 97, 39, 0.8); }
+
+        /* 空数据状态 */
+        &.null {
+            opacity: 0.3;
+            background: rgba(255, 255, 255, 0.1);
+        }
+    }
+}
+
+
+
+
+  /* 按钮交互效果  */
+  .nodes span {
+	padding: 0.5rem 1rem;
+	border-radius: 8px;
+	transition: all 0.3s ease;
+  }
+  
+  .nodes span:hover {
+	background: rgba(255,255,255,0.1);
+	transform: translateY(-2px);
+  }
+  
+  
+  @keyframes loading {
+	0% { width: 0; opacity: 1; }
+	50% { width: 100%; opacity: 0.5; }
+	100% { width: 100%; opacity: 0; }
+  }
+  
+
+  /* footer */
+
+.dashboard-footer {
+  background: var(--dark);
+  color: var(--light);
+  position: relative;
+  z-index: 50;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.footer-bottom {
+  padding: 1rem 0;
+  border-top: 1px solid var(--chart-bg);
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(248, 249, 250, 0.5);
+  display: flex;
+  align-items: center;     /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
+  gap: 6px; /* 让 Logo 和文本有间距 */
+}
+
+.footer-bottom p {
+  margin: 0; /* 移除默认的 margin，避免影响居中 */
+  display: flex;
+  align-items: center;     /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
+  gap: 10px; /* 增加元素间距，让内容更清晰 */
+  font-weight: 500; /* 适当加粗，增强可读性 */
+}
+
+.footer-bottom span {
+  font-weight: 600; /* 让动态数据更突出 */
+  color: var(--primary); /* 让版本号和运行时间的颜色更醒目 */
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-container {
+    padding: 0 1rem;
+  }
+  
+  .footer-bottom {
+    font-size: 0.7rem;
+  }
+}
+
+.FooterLogo {
+  width: 50px; /* 设置 logo 的宽度 */
+  height: 50px; /* 设置 logo 的高度 */
+  object-fit: contain; /* 确保 logo 保持比例 */
+}
+
+.footer-link {
+  text-decoration: none;
+  color: var(--primary); /* 默认颜色 */
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.footer-link:visited {
+  color: var(--primary); /* 取消点击后的变蓝效果 */
+}
+
+.footer-link:hover,
+.footer-link:hover .footerVersion {
+  color: var(--light); /* 悬停时整体变亮 */
+}
