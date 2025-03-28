@@ -59,6 +59,7 @@ async function checkUpdate(): Promise<void> {
   }
 }
 
+// 解析 markdown 文本
 function parseMarkdownAndLog(body: string): void {
   const lines = body.split("\r\n").filter(line => line.trim() !== "");
 
