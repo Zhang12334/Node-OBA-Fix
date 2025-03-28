@@ -101,7 +101,7 @@ const dataPath = path.resolve(Config.config.dataPath);
 
 	// 创建数据目录
 	if(!existsSync(dataPath)){
-		mkdirSync(dataPath);
+		mkdirSync(dataPath, { recursive: true });
 	}
 	const statsFilePath = path.join(dataPath, `./stats_${process.env.CLUSTER_ID || 'default'}.json`);
 
