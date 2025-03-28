@@ -46,7 +46,9 @@ function forkWorker(): void {
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`)  
 
       // 延迟
-      setTimeout(() => {}, delay)       
+      setTimeout(() => {
+        process.exit(1);
+      }, delay);
     } else {
       // 启用自动重启
       const delay = process.env.ENABLE_EXIT_DELAY === 'true'
