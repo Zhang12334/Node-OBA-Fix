@@ -10,7 +10,7 @@ export const logger = pino({
       colorize: true,
       translateTime: 'SYS:yyyy-mm-dd HH:MM:ss',
       ignore: 'pid,hostname',
-      messageFormat: '[Node-OBA-Fix] {msg}'
+      messageFormat: '[Cluster] {msg}'
     }
   }
 });

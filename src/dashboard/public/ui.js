@@ -375,7 +375,6 @@ queueMicrotask(() => {
 });
 
 const ui = {
-	webNodeIdx: -1,
 	loadStatsDataTimeout: null,
 };
 
@@ -398,10 +397,10 @@ const loadStatsData = async () => {
 	
 	let data = null;
 	try{
-		const response = await fetch(`./dashboard/api/stats?idx=${encodeURIComponent(ui.webNodeIdx)}`);
+		const response = await fetch(`./dashboard/api/stats`);
 		data = await response.json();
 	}catch(err){
-		console.warn(`[loadStatsData] 获取数据失败 [${ui.webNodeIdx}]:`, err);
+		console.warn(`[loadStatsData] 获取数据失败:`, err);
 	}
 	
 	ui.loadStatsDataTimeout = setTimeout(() => {

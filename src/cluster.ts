@@ -41,6 +41,7 @@ import type {IFileList} from './types.js'
 import {setupUpnp} from './upnp.js'
 import {checkSign, hashToFilename} from './util.js'
 import { aplPanelListener, aplPanelServe } from './dashboard/main.js';
+import chalk from "chalk"
 
 interface ICounters {
   hits: number
@@ -51,6 +52,17 @@ const whiteListDomain = ['localhost', 'bangbang93.com']
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname = dirname(fileURLToPath(import.meta.url))
+
+function extractIP(remoteAddr: string): string {
+  // 判断是否是 IPv4-mapped IPv6 地址
+  if (remoteAddr.startsWith("::ffff:")) {
+    // 提取 IPv4 地址
+    return remoteAddr.substring(7); // 去掉 "::ffff:"，保留 IPv4 地址
+  } else {
+    // 如果是纯 IPv6 地址
+    return remoteAddr;
+  }
+}
 
 export class Cluster {
   public readonly counters: ICounters = {hits: 0, bytes: 0}
@@ -300,9 +312,82 @@ export class Cluster {
 
     app.get('/auth', AuthRouteFactory(config))
 
+    // 花里胡哨的LOG
     if (!config.disableAccessLog) {
-      app.use(morgan(':datetime [:remote-addr] :url → :status | :response-time ms | [:user-agent] HTTP/:http-version'));
+      var formattedDate: string;
+      // 第一行：请求日志
+      app.use(
+        morgan((tokens, req, res) => {
+          const status = res.statusCode;
+          const statusColor =
+            status >= 500
+              ? chalk.red.bold
+              : status >= 400
+              ? chalk.yellow.bold
+              : status >= 300
+              ? chalk.cyan.bold
+              : status >= 200
+              ? chalk.green.bold
+              : chalk.white.bold;
+    
+          // 获取时间并检查是否为有效值
+          const rawDate = tokens.date(req, res);
+          const date = rawDate ? new Date(rawDate) : new Date(); // 如果 rawDate 是 undefined，使用当前时间
+
+          // 格式化日期并保存：YYYY-MM-DD HH:MM:SS
+          formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+          
+          // 提取纯 IPv6 或 IPv4 地址
+          const remoteAddr = tokens["remote-addr"](req, res);
+          const extractedIP = remoteAddr ? extractIP(remoteAddr) : "unknown";
+
+          // 拼接
+          return [
+            chalk.white(`[${formattedDate}]`), // 时间（白色）
+            chalk.green('INFO:'), // info前缀
+            chalk.blue(`[${extractedIP}]`), // 提取的 IP 地址（蓝色）
+            statusColor(`Response ${tokens.status(req, res)}`), // 状态码（彩色）
+            "→",
+            chalk.green(tokens.url(req, res)), // 请求 URL（绿色）
+          ].join(" ");
+        })
+      );
+    
+      // 第二行：响应日志
+      app.use(
+        morgan((tokens, req, res) => {
+
+          // 获取响应时间并去除 "ms"
+          const responseTimeRaw = tokens["response-time"](req, res);
+          const responseTime = responseTimeRaw ? parseFloat(responseTimeRaw.replace(' ms', '')) : 0; // 爆了就直接0ms，没说就是零卡！ 
+
+          // 根据响应时间设置颜色
+          let responseTimeColor = chalk.green; // 默认绿色
+          if (responseTime >= 500 && responseTime <= 5000) {
+            responseTimeColor = chalk.yellow; // 介于 0.5s 到 5s 之间为黄色
+          } else if (responseTime > 5000) {
+            responseTimeColor = chalk.red; // 大于 5s 为红色
+          }
+
+          // 提取纯 IPv6 或 IPv4 地址
+          const remoteAddr = tokens["remote-addr"](req, res);
+          const extractedIP = remoteAddr ? extractIP(remoteAddr) : "unknown";
+
+          // 拼接
+          return [
+            chalk.white(`[${formattedDate}]`), // 时间（白色）
+            chalk.green('INFO:'), // INFO 前缀
+            chalk.blue(`[${extractedIP}]`), // 提取的 IP 地址（蓝色）
+            chalk.white(`HTTP/${tokens["http-version"](req, res)}`), // HTTP 版本（白色）
+            chalk.gray('|'), // 分隔符
+            responseTimeColor(`${responseTime} ms`), // 响应时间
+            chalk.gray('|'), // 分隔符
+            chalk.cyan(tokens["user-agent"](req, res)), // UA（青色）
+          ].join(" ");
+        })
+      );
     }
+
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     aplPanelServe(app, this.storage);
     app.get('/download/:hash(\\w+)', async (req: Request, res: Response, next: NextFunction) => {

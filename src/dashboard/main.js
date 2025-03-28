@@ -284,12 +284,6 @@ export const aplPanelListener = async (req, bytes, hits) => {
  */
 export const aplPanelServe = (_app, _storage) => {
 	dash_logger.info(`正在启动面板服务`);
-	if(Config.allowRobots){
-		_app.get('/robots.txt', (req, res) => {
-			res.type('text/plain');
-			res.send('User-agent: *\nAllow: /dashboard');
-		});
-	}
 
 	_app.use('/', express.static(path.resolve('./dist/dashboard/public'), {
 		setHeaders: (res, urlPath) => {
@@ -301,6 +295,7 @@ export const aplPanelServe = (_app, _storage) => {
 			}
 		}
 	}));
+	dash_logger.info(`面板服务已启用`);
 
 	// 将涉及磁盘操作的数据缓存几秒
 	let nodeDataCache = {};
@@ -427,5 +422,6 @@ export const aplPanelServe = (_app, _storage) => {
 			});
 		}
 	});
+	dash_logger.info(`API已启用`);
 };
 
