@@ -161,4 +161,5 @@ openbmclapi 会自行同步需要的文件, 但是初次同步可能会速度过
 
 # 致谢
 
-- [**bangbang93**](https://github.com/bangbang93) 本项目fork自bangbang93的OpenBMCLAPI项目
+- [**bangbang93**](https://github.com/bangbang93) 本项目 Fork 自 bangbang93 的 OpenBMCLAPI 项目
+- [**ApliNi**](https://github.com/ApliNi) Dashboard API 改自 ApliNi 的 aplPanel 项目
