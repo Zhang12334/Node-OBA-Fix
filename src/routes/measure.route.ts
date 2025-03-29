@@ -63,6 +63,7 @@ export default function MeasureRouteFactory(config: Config, storage: IStorage): 
       }
     } else {
       // 如果不是alist，直接返回文件内容
+      // 暂时不计划为minio新增302 measure, 因为没有测试环境
       const buffer = Buffer.alloc(1024 * 1024, '0066ccff', 'hex');
       res.set('content-length', (size * 1024 * 1024).toString());
       for (let i = 0; i < size; i++) {
