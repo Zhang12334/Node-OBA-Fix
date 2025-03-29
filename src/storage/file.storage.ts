@@ -34,10 +34,6 @@ export class FileStorage implements IStorage {
     return await fse.pathExists(join(this.cacheDir, path))
   }
 
-  public getAbsolutePath(path: string): string {
-    return join(this.cacheDir, path)
-  }
-
   public async getMissingFiles(files: IFileInfo[]): Promise<IFileInfo[]> {
     return await Bluebird.filter(
       files,
@@ -119,5 +115,9 @@ export class FileStorage implements IStorage {
         }
       })
     })
+  }
+
+  private getAbsolutePath(path: string): string {
+    return join(this.cacheDir, path)
   }
 }
