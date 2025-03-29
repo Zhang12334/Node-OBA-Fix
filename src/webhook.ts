@@ -3,7 +3,7 @@ import { logger } from './logger.js';  // 导入日志
 
 class Webhook {
     private url = config.webhookUrl;
-    private webhookPrefix = `[${config.webhookPrefix}]` || "[Node-OpenBMCLAPI-Fix]";
+    private clusterName = `[${config.clusterName}]` || "[Node-OpenBMCLAPI-Fix]";
 
     public async send(message: string): Promise<void> {
         if (!this.url) {
@@ -19,7 +19,7 @@ class Webhook {
         logger.debug(`成功获取到 Webhook 消息主体: ${trimmedMessage}`)
 
         try {
-            const sendMessage = `${this.webhookPrefix} ${trimmedMessage}`;
+            const sendMessage = `${this.clusterName} ${trimmedMessage}`;
             logger.debug(`成功构建 Webhook 消息: ${sendMessage}`)
             const response = await fetch(this.url, {
                 method: 'POST',

@@ -34,6 +34,8 @@ export class Config {
   public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
   public readonly noConnect = env.get('NO_CONNECT').asBool()  
 
+  public readonly clusterName = env.get('CLUSTER_NAME').asString()
+
   // SSL
   public readonly sslKey = env.get('SSL_KEY').asString()
   public readonly sslCert = env.get('SSL_CERT').asString()
@@ -49,7 +51,7 @@ export class Config {
 
   // 视觉配置项
   public readonly disableOptiLog = env.get('DISABLE_OPTI_LOG').asBool()
-  public readonly enableNewSyncStatus = env.get('ENABLE_NEW_SYNC_STATUS').asBool()
+  public readonly disableNewSyncStatus = env.get('DISABLE_NEW_SYNC_STATUS').asBool()
 
   // webhook 配置项
   public readonly enableWebhookReconnect = env.get('WEBHOOK_RECONNECT').asBool()
@@ -63,7 +65,6 @@ export class Config {
   public readonly WebhookErrorMessage = env.get('WEBHOOK_ERROR_MESSAGE').asString()
 
   public readonly webhookUrl = env.get('WEBHOOK_URL').asString()
-  public readonly webhookPrefix = env.get('WEBHOOK_PREFIX').asString()
 
   private constructor() {
     this.flavor = {

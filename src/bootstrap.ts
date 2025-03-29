@@ -7,7 +7,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { Cluster } from './cluster.js';
 import { config } from './config.js';
-import { logger } from './logger.js';
+import {logger, sync_logger} from './logger.js'
 import { TokenManager } from './token.js';
 import { IFileList } from './types.js';
 import got from 'got';
@@ -268,16 +268,16 @@ export async function bootstrap(version: string, protocol_version: string): Prom
 
   const configuration = await cluster.getConfiguration();
   const files = await cluster.getFileList();
-  logger.info(`${files.files.length} files`);
+  sync_logger.info(`${files.files.length} files`);
   try {
     await cluster.syncFiles(files, configuration.sync);
   } catch (e) {
     if (e instanceof HTTPError) {
-      logger.error({ url: e.response.url }, '下载失败');
+      sync_logger.error({ url: e.response.url }, '下载失败');
     }
     throw e;
   }
-  logger.info('回收文件');
+  sync_logger.info('回收文件');
   cluster.gcBackground(files);
 
   let checkFileInterval: NodeJS.Timeout;
@@ -312,12 +312,12 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   }
 
   async function checkFile(lastFileList: IFileList): Promise<void> {
-    logger.debug('刷新文件中');
+    sync_logger.debug('刷新文件中');
     try {
       const lastModified = max(lastFileList.files.map((file) => file.mtime));
       const fileList = await cluster.getFileList(lastModified);
       if (fileList.files.length === 0) {
-        logger.debug('没有新文件');
+        sync_logger.debug('没有新文件');
         return;
       }
       const configuration = await cluster.getConfiguration();
@@ -326,7 +326,7 @@ export async function bootstrap(version: string, protocol_version: string): Prom
     } finally {
       checkFileInterval = setTimeout(() => {
         checkFile(lastFileList).catch((e) => {
-          logger.error(e, '文件检查失败');
+          sync_logger.error(e, '文件检查失败');
         });
       }, ms('10m'));
     }

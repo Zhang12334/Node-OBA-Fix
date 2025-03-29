@@ -31,7 +31,7 @@ import {config, type OpenbmclapiAgentConfiguration, OpenbmclapiAgentConfiguratio
 import {FileListSchema} from './constants.js'
 import {validateFile} from './file.js'
 import {Keepalive} from './keepalive.js'
-import {logger} from './logger.js'
+import {logger, sync_logger} from './logger.js'
 import {webhook} from './webhook.js'
 import {beforeError} from './modules/got-hooks.js'
 import {AuthRouteFactory} from './routes/auth.route.js'
@@ -205,20 +205,32 @@ export class Cluster {
     if (!storageReady) {
       throw new Error('存储异常')
     }
-    logger.info('正在检查缺失文件')
+    sync_logger.info('正在检查缺失文件')
     const missingFiles = await this.storage.getMissingFiles(fileList.files)
     if (missingFiles.length === 0) {
       return
+    } else {
+      sync_logger.info(`缺少 ${missingFiles.length} 个文件, 正在开始同步`)
     }
-    logger.info(`缺少 ${missingFiles.length} 个文件, 正在开始同步`)
     
     // 看着太割裂了，而且没啥大用，扔debug里
     logger.debug(syncConfig, '同步策略')
+    
+    const parallel =
+      config.syncConcurrency === undefined || config.syncConcurrency < 1
+          ? syncConfig.concurrency
+          : config.syncConcurrency > 20
+          ? 20
+          : config.syncConcurrency;
+
+    sync_logger.info(`同步并发数: ${parallel}`)
+    sync_logger.info(`节点信息: ${config.clusterName || 'Cluster'}`)
+
 
     let newmultibar: any;
     let oldmultibar: any;
 
-    if (config.enableNewSyncStatus) {
+    if (!config.disableNewSyncStatus) {
       // 新的样式
       newmultibar = new MultiBar({
         format: `${getCurrentTime()} ${chalk.green('INFO')}${chalk.white(':')} ${chalk.blue('[Sync] 同步进度 {value}/{total} | {bar} |')}`, // 虽然不是同一个log系统，但就是要一个效果，别问，问就是好看
@@ -235,33 +247,25 @@ export class Cluster {
     }
     
     let totalBar;
-    if (config.enableNewSyncStatus) {
+    if (!config.disableNewSyncStatus) {
       // 新样式
       totalBar = newmultibar.create(missingFiles.length, 0, {filename: '总文件数'})
     } else {
       // 旧样式
       totalBar = oldmultibar.create(missingFiles.length, 0, {filename: '总文件数'})
     }
-    const parallel =
-      config.syncConcurrency === undefined || config.syncConcurrency < 1
-          ? syncConfig.concurrency
-          : config.syncConcurrency > 20
-          ? 20
-          : config.syncConcurrency;
-
-    logger.info(`同步并发数: ${parallel}`)
     let hasError = false
     await pMap(
       missingFiles,
       async (file) => {
         let bar: any;
-        if (!config.enableNewSyncStatus) {
+        if (config.disableNewSyncStatus) {
           bar = oldmultibar.create(file.size, 0, { filename: file.path });
         }       
         try {
           await pRetry(
             async () => {
-              if (!config.enableNewSyncStatus) {
+              if (config.disableNewSyncStatus) {
                 bar.update(0)
               }
               const res = await this.got
@@ -271,7 +275,7 @@ export class Cluster {
                   },
                 })
                 .on('downloadProgress', (progress) => {
-                  if (!config.enableNewSyncStatus) {
+                  if (config.disableNewSyncStatus) {
                     bar.update(progress.transferred)
                   }
                 })
@@ -330,7 +334,7 @@ export class Cluster {
           }
         } finally {
           totalBar.increment()
-          if (!config.enableNewSyncStatus) {
+          if (config.disableNewSyncStatus) {
             bar.stop()
             oldmultibar.remove(bar)
           }
@@ -340,7 +344,7 @@ export class Cluster {
         concurrency: parallel,
       },
     )
-    if (config.enableNewSyncStatus) {
+    if (!config.disableNewSyncStatus) {
       // 新样式
       newmultibar.stop()
     } else {
