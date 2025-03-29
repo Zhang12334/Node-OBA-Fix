@@ -31,7 +31,8 @@ class Webhook {
                 throw new Error(`HTTP 错误: ${response.status} ${response.statusText}`);
             }
 
-            logger.debug(`Webhook 消息已发送: ${sendMessage}`);
+            logger.info(`Webhook 消息已发送`);
+            logger.debug(`消息内容: ${sendMessage}`);
         } catch (error) {
             logger.error('Webhook 发送失败: ', error);
         }
