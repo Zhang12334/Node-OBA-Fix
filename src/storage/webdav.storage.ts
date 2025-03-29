@@ -162,7 +162,7 @@ export class WebdavStorage implements IStorage {
                 continue;
             }
             if (!fileSet.has(entry.basename)) {
-                logger.info(colors.gray(`delete expire file: ${entry.filename}`));
+                logger.info(colors.gray(`已删除临时文件: ${entry.filename}`));
                 await this.client.deleteFile(entry.filename);
                 this.files.delete(entry.basename);
                 counter.count++;

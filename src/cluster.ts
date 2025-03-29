@@ -219,8 +219,8 @@ export class Cluster {
     const parallel =
       config.syncConcurrency === undefined || config.syncConcurrency < 1
           ? syncConfig.concurrency
-          : config.syncConcurrency > 20
-          ? 20
+          : config.syncConcurrency > 100
+          ? 100
           : config.syncConcurrency;
 
     sync_logger.info(`同步并发数: ${parallel}`)
