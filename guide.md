@@ -12,27 +12,36 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 
 # 配置
 
-| 环境变量             | 必填 | 默认值             | 说明                                                                                                     |
-|---------------------|------|-------------------|----------------------------------------------------------------------------------------------------------|
-| CLUSTER_ID          |  是  | -                 | 集群 ID                                                                                                   |
-| CLUSTER_SECRET      |  是  | -                 | 集群密钥                                                                                                  |
-| CLUSTER_IP          |  否  | 自动获取公网出口IP  | 用户访问时使用的 IP 或域名                                                                                 |
-| CLUSTER_PORT        |  否  | 4000              | 监听端口                                                                                                  |
-| CLUSTER_PUBLIC_PORT |  否  | CLUSTER_PORT      | 对外端口                                                                                                  |
-| CLUSTER_BYOC        |  否  | false             | 是否使用自定义证书 (BYOC=Bring you own certificate, 当使用国内服务器需要备案时, 需要启用这个参数来使用你自己的带证书的域名, 需搭配下方SSL相关设置使用) |
-| SSL_KEY             |  否  | -                 | (仅当开启BYOC时) SSL 证书私钥, 可以直接粘贴证书内容，也可以填写文件名                                        |
-| SSL_CERT            |  否  | -                 | (仅当开启BYOC时) SSL 证书公钥, 可以直接粘贴证书内容，也可以填写文件名                                        |
-| ENABLE_NGINX        |  否  | false             | 使用 nginx 提供文件服务                                                                                   |
-| DISABLE_ACCESS_LOG  |  否  | false             | 禁用访问日志输出                                                                                          |
-| ENABLE_UPNP         |  否  | false             | 启用 UPNP 端口映射                                                                                       |
-| RESTART_PROCESS     |  否  | true              | 在当前进程意外退出后调用自身功能自动重启进程                                                                |
-| ENABLE_EXIT_DELAY   |  否  | false             | 使用自定义固定秒数而非内置退避策略的重启前等待时间                                                          |
-| EXIT_DELAY          |  否  | 3                 | 在重启/退出前进行自定义秒数的延迟                                                                          |
-| LOGLEVEL            |  否  | info              | 切换日志等级                                                                                             |
-| NO_DAEMON           |  否  | false             | 是否禁用子进程模式(推荐设置为false即不禁用, 禁用后无法使用自动重启或退出前延迟功能)                           |
-| STARTUP_LIMIT       |  否  | 90                | 24h启动的最多次数(以请求上线次数为准, 超过后将定时刷新，等待24h内上线次数不超限时再启动，避免被主控封禁)        |
-| STARTUP_LIMIT_WAIT_TIMEOUT |  否  | 600        | 上线次数超限时等待响应的超时时间, 单位为秒, 一般10分钟即可无需修改                                           |
-| CLUSTER_NO_ENABLE   |  否  | false             | 是否禁用节点上线（会正常走开启流程、同步，但不会请求上线，一般用于调试或同步文件，请勿在生产环境中使用）         |
+| 环境变量                    | 必填 | 默认值                  | 说明                                                                                                                                          |
+|----------------------------|------|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| CLUSTER_ID                 |  是  | -                      | 集群 ID                                                                                                                                       |
+| CLUSTER_SECRET             |  是  | -                      | 集群密钥                                                                                                                                       |
+| CLUSTER_IP                 |  否  | 自动获取公网出口IP      | 用户访问时使用的 IP 或域名                                                                                                                       |
+| CLUSTER_PORT               |  否  | 4000                   | 监听端口                                                                                                                                       |
+| CLUSTER_PUBLIC_PORT        |  否  | CLUSTER_PORT           | 对外端口                                                                                                                                       |
+| CLUSTER_BYOC               |  否  | false                  | 是否使用自定义证书 (BYOC=Bring you own certificate, 当使用国内服务器需要备案时, 需要启用这个参数来使用你自己的带证书的域名, 需搭配下方SSL相关设置使用) |
+| SSL_KEY                    |  否  | -                      | (仅当开启BYOC时) SSL 证书私钥, 可以直接粘贴证书内容，也可以填写文件名                                                                              |
+| SSL_CERT                   |  否  | -                      | (仅当开启BYOC时) SSL 证书公钥, 可以直接粘贴证书内容，也可以填写文件名                                                                              |
+| ENABLE_NGINX               |  否  | false                  | 使用 nginx 提供文件服务                                                                                                                         |
+| DISABLE_ACCESS_LOG         |  否  | false                  | 禁用访问日志输出                                                                                                                                |
+| ENABLE_UPNP                |  否  | false                  | 启用 UPNP 端口映射                                                                                                                             |
+| RESTART_PROCESS            |  否  | true                   | 在当前进程意外退出后调用自身功能自动重启进程                                                                                                      |
+| ENABLE_EXIT_DELAY          |  否  | false                  | 使用自定义固定秒数而非内置退避策略的重启前等待时间                                                                                                |
+| EXIT_DELAY                 |  否  | 3                      | 在重启/退出前进行自定义秒数的延迟                                                                                                                |
+| LOGLEVEL                   |  否  | info                   | 切换日志等级                                                                                                                                   |
+| NO_DAEMON                  |  否  | false                  | 是否禁用子进程模式(推荐设置为false即不禁用, 禁用后无法使用自动重启或退出前延迟功能)                                                                 |
+| STARTUP_LIMIT              |  否  | 90                     | 24h启动的最多次数(以请求上线次数为准, 超过后将定时刷新，等待24h内上线次数不超限时再启动，避免被主控封禁)                                              |
+| STARTUP_LIMIT_WAIT_TIMEOUT |  否  | 600                    | 上线次数超限时等待响应的超时时间, 单位为秒, 一般10分钟即可无需修改                                                                                 |
+| CLUSTER_NO_ENABLE          |  否  | false                  | 是否禁用节点上线（会正常走开启流程、同步，但不会请求上线，一般用于调试或同步文件，请勿在生产环境中使用）                                               |
+| WEBHOOK_RECONNECT          |  否  | false                  | 是否启用节点重连时触发的 Webhook                                                                                                                 |
+| WEBHOOK_STARTUP            |  否  | false                  | 是否启用节点上线时触发的 Webhook                                                                                                                 |
+| WEBHOOK_SHUTDOWN           |  否  | false                  | 是否启用节点下线时触发的 Webhook                                                                                                                 |
+| WEBHOOK_ERROR              |  否  | false                  | 是否启用节点工作进程异常退出时触发的 Webhook                                                                                                      |
+| 对应webhook配置项_MESSAGE   |  否  | -                      | 自定义触发 Webhook 时发送的消息，如：WEBHOOK_ERROR_MESSAGE / WEBHOOK_SHUTDOWN_MESSAGE                                                            |
+| WEBHOOK_PREFIX             |  否  | Node-OpenBMCLAPI-Fix   | 自定义触发 Webhook 时发送的消息前缀，可设置为节点名称方便区分                                                                                      |
+| WEBHOOK_URL                |  否  | -                      | Webhook URL，如：WEBHOOK_URL=http://127.0.0.1:8080/webhook                                                                                     |
+
+备注：Webhook的整体结构为 `[前缀] 消息内容`，如：`[Node-OpenBMCLAPI-Fix] 节点已下线`、`[Node-OpenBMCLAPI-Fix] 节点已重连`
 
 在部分性能较低的设备上，程序内置的自动重启功能可能会导致重新连接时出现问题（例如卡死等）
 

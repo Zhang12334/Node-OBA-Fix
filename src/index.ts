@@ -1,18 +1,20 @@
 import cluster from 'cluster'
-import {config} from 'dotenv'
+import {config as dotenvConfig} from 'dotenv'
 import {readFileSync} from 'fs'
 import ms from 'ms'
 import {fileURLToPath} from 'url'
 import {bootstrap} from './bootstrap.js'
 import {logger} from './logger.js'
+import {webhook} from './webhook.js'
+import {config} from './config.js'
 
 const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8')) as {
   protocol_version: string
   version: string
 }
 
-// 加载环境变量
-config()
+// 加载env
+dotenvConfig()
 
 // 如果以非守护进程模式运行，直接启动应用
 if (process.env.NO_DAEMON || !cluster.isPrimary) {
@@ -45,6 +47,10 @@ function forkWorker(): void {
 
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`)  
 
+      if (config.enableWebhookError) {
+        webhook.send(config.WebhookErrorMessage || `工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`); 
+      }
+
       // 延迟
       setTimeout(() => {
         process.exit(1);
@@ -56,6 +62,11 @@ function forkWorker(): void {
         : backoff * 1000 // 使用退避策略
 
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`)
+
+      if (config.enableWebhookError) {
+        webhook.send(config.WebhookErrorMessage || `工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`); 
+      }
+
       setTimeout(() => forkWorker(), delay)
 
       // 如果未启用自定义延迟, 更新退避时间

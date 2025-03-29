@@ -130,6 +130,7 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   logger.info(colors.green(`当前版本: ${version}`));
   logger.info(colors.green(`协议版本: ${protocol_version}`));
   logger.debug(colors.yellow(`已开启debug日志`));
+  logger.debug(colors.yellow(`已开启Webhook功能`));
 
   checkUpdate().catch(console.error);
 
@@ -274,14 +275,15 @@ export async function bootstrap(version: string, protocol_version: string): Prom
 
   let checkFileInterval: NodeJS.Timeout;
   if (config.noENABLE === true) {
-    logger.info('节点上线功能已禁用');
-    logger.info('节点上线功能已禁用');
-    logger.info('节点上线功能已禁用');
+    logger.warn('节点上线功能已禁用');
+    logger.warn('节点上线功能已禁用');
+    logger.warn('节点上线功能已禁用');
+    logger.warn('节点上线功能已禁用');
+    logger.warn('节点上线功能已禁用');    
   } else {
     try {
       logger.info('请求上线');
       await cluster.enable();
-
       logger.info(colors.rainbow(`节点启动完毕, 正在提供 ${files.files.length} 个文件`));
       if (nodeCluster.isWorker && typeof process.send === 'function') {
         process.send('ready');

@@ -6,7 +6,7 @@
 
 ### 承其本源，另创新境
 
-### 一个 OpenBMCLAPI 官方 Node.JS 客户端的修改版本, 提供多种额外功能
+### 一个 OpenBMCLAPI 官方 Node.JS 节点端的修改版本, 提供多种额外功能
 
 支持的平台: Windows | MacOS | Linux
 

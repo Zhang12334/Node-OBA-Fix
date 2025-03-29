@@ -38,6 +38,21 @@ export class Config {
 
   public readonly protocol_version = packageJson.protocol_version
   public readonly version = packageJson.version
+
+  // webhook 配置项
+  public readonly enableWebhookReconnect = env.get('WEBHOOK_RECONNECT').asBool()
+  public readonly enableWebhookStartUP = env.get('WEBHOOK_STARTUP').asBool()
+  public readonly enableWebhookShutdown = env.get('WEBHOOK_SHUTDOWN').asBool()
+  public readonly enableWebhookError = env.get('WEBHOOK_ERROR').asBool()
+
+  public readonly WebhookReconnectMessage = env.get('WEBHOOK_RECONNECT_MESSAGE').asString()
+  public readonly WebhookStartUPMessage = env.get('WEBHOOK_STARTUP_MESSAGE').asString()
+  public readonly WebhookShutdownMessage = env.get('WEBHOOK_SHUTDOWN_MESSAGE').asString()
+  public readonly WebhookErrorMessage = env.get('WEBHOOK_ERROR_MESSAGE').asString()
+
+  public readonly webhookUrl = env.get('WEBHOOK_URL').asString()
+  public readonly webhookPrefix = env.get('WEBHOOK_PREFIX').asString()
+
   private constructor() {
     this.flavor = {
       runtime: `Node.js/${process.version}`,
