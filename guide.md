@@ -40,6 +40,10 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | 对应webhook配置项_MESSAGE   |  否  | -                      | 自定义触发 Webhook 时发送的消息，如：WEBHOOK_ERROR_MESSAGE / WEBHOOK_SHUTDOWN_MESSAGE                                                            |
 | WEBHOOK_PREFIX             |  否  | Node-OpenBMCLAPI-Fix   | 自定义触发 Webhook 时发送的消息前缀，可设置为节点名称方便区分                                                                                      |
 | WEBHOOK_URL                |  否  | -                      | Webhook URL，如：WEBHOOK_URL=http://127.0.0.1:8080/webhook                                                                                     |
+| SYNC_CONCURRENCY           |  否  | -                      | 同步文件时并发数量，默认从主控获取（注：此配置项主要为主控不下发20并发的情况提供保底，因此设置的上限值为20，设置超过20时默认取最高值20）                  |
+| ENABLE_NEW_SYNC_STATUS     |  否  | false                  | 启用新的同步状态显示，会关闭单个文件的下载进度显示并更改排版                                                                                        |
+| NO_CONNECT                 |  否  | false                  | 禁用连接主控功能（也不会请求证书）（可配合CLUSTER_NO_ENABLE+自定义证书搭建针对单节点多线的多端负载均衡）                                              |
+| DISABLE_OPTI_LOG           |  否  | false                  | 显示未优化的日志（请求地址会显示?后的部分，如优化后/measure/1，优化前/measure/1?s=w4Yh2cnF6Ctmo4CwUxZve2jN1UU&e=m8u973ob）                          |
 
 备注：Webhook的整体结构为 `[前缀] 消息内容`，如：`[Node-OpenBMCLAPI-Fix] 节点已下线`、`[Node-OpenBMCLAPI-Fix] 节点已重连`
 

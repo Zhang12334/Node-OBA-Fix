@@ -117,7 +117,7 @@ export class FileStorage implements IStorage {
     })
   }
 
-  private getAbsolutePath(path: string): string {
+  public getAbsolutePath(path: string): string {
     return join(this.cacheDir, path)
   }
 }

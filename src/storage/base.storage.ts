@@ -16,6 +16,8 @@ export interface IStorage {
 
   exists(path: string): Promise<boolean>
 
+  getAbsolutePath(path: string): string
+
   getMissingFiles(files: IFileInfo[]): Promise<IFileInfo[]>
 
   gc(files: {path: string; hash: string; size: number}[]): Promise<IGCCounter>

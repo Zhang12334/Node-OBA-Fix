@@ -100,6 +100,11 @@ export class MinioStorage implements IStorage {
     return {bytes: size, hits: 1}
   }
 
+  public getAbsolutePath(path: string): string {
+    // 理论上由于限制alist存储方式，是永远跑不到这里的，但是不写会报错所以加上了
+    return "http://127.0.0.1/error";
+  }
+
   public async gc(files: {path: string; hash: string; size: number}[]): Promise<IGCCounter> {
     const counter = {count: 0, size: 0}
     const fileSet = new Set<string>()
@@ -112,7 +117,7 @@ export class MinioStorage implements IStorage {
       if (!item.name) continue
       const path = item.name.replace(this.prefix, '')
       if (!fileSet.has(path)) {
-        logger.info(colors.gray(`delete expire file: ${path}`))
+        logger.info(colors.gray(`已删除临时文件: ${path}`))
         await this.internalClient.removeObject(this.bucket, item.name)
         this.files.delete(path)
         counter.count++

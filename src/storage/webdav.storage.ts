@@ -58,6 +58,10 @@ export class WebdavStorage implements IStorage {
     }
   }
 
+  public getAbsolutePath(path: string): string {
+    return this.client.getFileDownloadLink(join(this.basePath, path))
+  }
+
   public async check(): Promise<boolean> {
     try {
       await this.client.putFileContents(join(this.basePath, '.check'), Buffer.from(Date.now().toString()))

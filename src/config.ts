@@ -16,6 +16,7 @@ const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.js
 export class Config {
   public static instance: Config
 
+  // 节点本体相关
   public readonly clusterId = env.get('CLUSTER_ID').required().asString()
   public readonly clusterSecret = env.get('CLUSTER_SECRET').required().asString()
   public readonly clusterIp? = env.get('CLUSTER_IP').asString()
@@ -29,15 +30,26 @@ export class Config {
   public readonly storage = env.get('CLUSTER_STORAGE').default('file').asString()
   public readonly storageOpts = env.get('CLUSTER_STORAGE_OPTIONS').asJsonObject()
 
+  public readonly restartProcess = env.get('RESTART_PROCESS').asBool()
+  public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
+  public readonly noConnect = env.get('NO_CONNECT').asBool()  
+
+  // SSL
   public readonly sslKey = env.get('SSL_KEY').asString()
   public readonly sslCert = env.get('SSL_CERT').asString()
 
-  public readonly restartProcess = env.get('RESTART_PROCESS').asBool()
-  public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
   public readonly flavor: IConfigFlavor
-
+  
+  // 版本
   public readonly protocol_version = packageJson.protocol_version
   public readonly version = packageJson.version
+
+  // 同步设置项
+  public readonly syncConcurrency = env.get('SYNC_CONCURRENCY').default(10).asInt()
+
+  // 视觉配置项
+  public readonly disableOptiLog = env.get('DISABLE_OPTI_LOG').asBool()
+  public readonly enableNewSyncStatus = env.get('ENABLE_NEW_SYNC_STATUS').asBool()
 
   // webhook 配置项
   public readonly enableWebhookReconnect = env.get('WEBHOOK_RECONNECT').asBool()

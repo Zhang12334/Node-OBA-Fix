@@ -53,6 +53,18 @@ const whiteListDomain = ['localhost', 'bangbang93.com']
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname = dirname(fileURLToPath(import.meta.url))
+const getCurrentTime = () => {
+  const now = new Date();
+  return `[${now.toISOString().replace('T', ' ').slice(0, 19)}]`; // 格式化为 [2025-03-29 21:19:26]
+};
+
+function getURL(url: string) {
+  if (config.disableOptiLog) {
+    return chalk.green(url);
+  } else {
+    return chalk.green(url.split('?')[0]);
+  }
+}
 
 function extractIP(remoteAddr: string): string {
   // 判断是否是 IPv4-mapped IPv6 地址
@@ -199,23 +211,59 @@ export class Cluster {
       return
     }
     logger.info(`缺少 ${missingFiles.length} 个文件, 正在开始同步`)
-    logger.info(syncConfig, '同步策略')
-    const multibar = new MultiBar({
-      format: ' {bar} | {filename} | {value}/{total}',
-      noTTYOutput: true,
-      notTTYSchedule: ms('10s'),
-    })
-    const totalBar = multibar.create(missingFiles.length, 0, {filename: '总文件数'})
-    const parallel = syncConfig.concurrency
+    
+    // 看着太割裂了，而且没啥大用，扔debug里
+    logger.debug(syncConfig, '同步策略')
+
+    let newmultibar: any;
+    let oldmultibar: any;
+
+    if (config.enableNewSyncStatus) {
+      // 新的样式
+      newmultibar = new MultiBar({
+        format: `${getCurrentTime()} ${chalk.green('INFO')}${chalk.white(':')} ${chalk.blue('[Sync] 同步进度 {value}/{total} | {bar} |')}`, // 虽然不是同一个log系统，但就是要一个效果，别问，问就是好看
+        noTTYOutput: true,
+        notTTYSchedule: ms('10s'),
+      });
+    } else {
+      // 旧样式
+      oldmultibar = new MultiBar({
+        format: ' {bar} | {filename} | {value}/{total}',
+        noTTYOutput: true,
+        notTTYSchedule: ms('10s'),
+      });
+    }
+    
+    let totalBar;
+    if (config.enableNewSyncStatus) {
+      // 新样式
+      totalBar = newmultibar.create(missingFiles.length, 0, {filename: '总文件数'})
+    } else {
+      // 旧样式
+      totalBar = oldmultibar.create(missingFiles.length, 0, {filename: '总文件数'})
+    }
+    const parallel =
+      config.syncConcurrency === undefined || config.syncConcurrency < 1
+          ? syncConfig.concurrency
+          : config.syncConcurrency > 20
+          ? 20
+          : config.syncConcurrency;
+
+    logger.info(`同步并发数: ${parallel}`)
     let hasError = false
     await pMap(
       missingFiles,
       async (file) => {
-        const bar = multibar.create(file.size, 0, {filename: file.path})
+        let bar: any;
+        if (!config.enableNewSyncStatus) {
+          bar = oldmultibar.create(file.size, 0, { filename: file.path });
+        }       
         try {
           await pRetry(
             async () => {
-              bar.update(0)
+              if (!config.enableNewSyncStatus) {
+                bar.update(0)
+              }
               const res = await this.got
                 .get<Buffer>(file.path.substring(1), {
                   retry: {
@@ -223,7 +271,9 @@ export class Cluster {
                   },
                 })
                 .on('downloadProgress', (progress) => {
-                  bar.update(progress.transferred)
+                  if (!config.enableNewSyncStatus) {
+                    bar.update(progress.transferred)
+                  }
                 })
 
               const isFileCorrect = validateFile(res.body, file.hash)
@@ -280,15 +330,23 @@ export class Cluster {
           }
         } finally {
           totalBar.increment()
-          bar.stop()
-          multibar.remove(bar)
+          if (!config.enableNewSyncStatus) {
+            bar.stop()
+            oldmultibar.remove(bar)
+          }
         }
       },
       {
         concurrency: parallel,
       },
     )
-    multibar.stop()
+    if (config.enableNewSyncStatus) {
+      // 新样式
+      newmultibar.stop()
+    } else {
+      // 旧样式
+      oldmultibar.stop()
+    }
     if (hasError) {
       throw new Error('同步失败')
     } else {
@@ -349,7 +407,7 @@ export class Cluster {
             chalk.blue(`[${extractedIP}]`), // 提取的 IP 地址（蓝色）
             statusColor(`Response ${tokens.status(req, res)}`), // 状态码（彩色）
             "→",
-            chalk.green(tokens.url(req, res)), // 请求 URL（绿色）
+            getURL(tokens.url(req, res) as string),
           ].join(" ");
         })
       );
@@ -367,7 +425,7 @@ export class Cluster {
           if (responseTime >= 500 && responseTime <= 5000) {
             responseTimeColor = chalk.yellow; // 介于 0.5s 到 5s 之间为黄色
           } else if (responseTime > 5000) {
-            responseTimeColor = chalk.red; // 大于 5s 为红色
+            responseTimeColor = chalk.hex('#FFA500'); // 大于 5s 为橙色
           }
 
           // 提取纯 IPv6 或 IPv4 地址

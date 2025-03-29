@@ -206,7 +206,9 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   await tokenManager.getToken();
   const cluster = new Cluster(config.clusterSecret, protocol_version, tokenManager);
   await cluster.init();
-  cluster.connect();
+  if(!config.noConnect){
+    cluster.connect();
+  }
 
   let proto: 'http' | 'https' = 'https';
   if (config.byoc) {
@@ -218,8 +220,12 @@ export async function bootstrap(version: string, protocol_version: string): Prom
       await cluster.useSelfCert();
     }
   } else {
-    logger.info('请求证书');
-    await cluster.requestCert();
+    if(!config.noConnect){
+      logger.info('请求证书');
+      await cluster.requestCert();
+    } else {
+      logger.info('已跳过请求证书');
+    }
   }
 
   if (config.enableNginx) {
@@ -245,15 +251,16 @@ export async function bootstrap(version: string, protocol_version: string): Prom
 
   // 如果是 alist 类型存储，生成 10MB 的测速文件
   if (storageType === 'alist') {
-    logger.debug('准备生成测速文件');
+    logger.debug('准备预生成测速文件');
     try {
       // 同时生成 1MB 和 10MB 测速文件
       await Promise.all([
         createAndUploadFileToAlist(1),
         createAndUploadFileToAlist(10),
       ]);
+      logger.info('预生成测速文件完毕')
     } catch (error) {
-      logger.error(error, '生成测速文件失败');
+      logger.error(error, '预生成测速文件失败');
       throw new Error('测速文件生成失败');
     }
   }
@@ -274,7 +281,7 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   cluster.gcBackground(files);
 
   let checkFileInterval: NodeJS.Timeout;
-  if (config.noENABLE === true) {
+  if (config.noENABLE) {
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
