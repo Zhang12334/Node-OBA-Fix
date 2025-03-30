@@ -12,11 +12,11 @@ jobs:
           - os: ubuntu-24.04
             artifact_name: "Node-OBA-Fix-linux-x64.tar.xz"
 
+          - os: Onecloud
+            artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"
+
           - os: ubuntu-24.04-arm
             artifact_name: "Node-OBA-Fix-linux-arm64.tar.xz"  
-
-          - artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"
-            runner: ArmV7L  # 使用自托管 Runner
 
           - os: macos-13
             artifact_name: "Node-OBA-Fix-macos-x64.tar.xz"
