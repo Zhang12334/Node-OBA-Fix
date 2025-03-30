@@ -15,6 +15,12 @@ jobs:
           - os: ubuntu-latest
             arch: aarch64
             artifact_name: "Node-OBA-Fix-linux-aarch64.tar.xz"
+          - os: ubuntu-latest
+            arch: armv7
+            artifact_name: "Node-OBA-Fix-linux-armv7.tar.xz"
+          - os: ubuntu-latest
+            arch: armv7l
+            artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
           - os: macos-latest
             arch: x86_64
             artifact_name: "Node-OBA-Fix-macos-x86_64.tar.xz"
@@ -31,6 +37,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+
+      # QEMU arm
+      - name: Set up QEMU
+        if: matrix.arch == 'armv7' || matrix.arch == 'armv7l'
+        uses: docker/setup-qemu-action@v3
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
