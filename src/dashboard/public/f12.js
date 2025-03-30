@@ -1,12 +1,17 @@
+let cachedVersion = null;
 async function fetchVersion() {
+  if (cachedVersion !== null) {
+    return cachedVersion;
+  }
   try {
     const response = await fetch('/dashboard/api/version');
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
-    return {
+    cachedVersion = {
       version: 'v' + (data.version || '0.0.1'),
       protocol_version: 'v' + (data.protocol_version || '0.0.1')
     };
+    return cachedVersion;
   } catch (error) {
     console.error('Version fetch failed:', error);
     return { version: 'Error', protocol_version: 'Error' };

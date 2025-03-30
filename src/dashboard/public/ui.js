@@ -378,20 +378,38 @@ const ui = {
 	loadStatsDataTimeout: null,
 };
 
+// 获取页脚版本号显示元素
+const footerVersion = document.querySelector('.dashboard-footer .footerVersion');
+// 标记是否已成功获取过版本号
+let isVersionFetched = false;
+
+async function fetchVersion() {
+  // 如果已经获取过版本号，则不再请求
+  if (isVersionFetched) return;
+
+  try {
+    // 请求版本号API
+    const response = await fetch('/dashboard/api/version');
+    const data = await response.json();
+    
+    // 如果页脚元素存在，则更新显示
+    if (footerVersion) {
+      footerVersion.textContent = `v${data.version}`;
+      // 标记已成功获取版本号
+      isVersionFetched = true;
+    }
+  } catch (error) {
+    console.error('获取版本号失败:', error);
+    // 仅当从未设置过版本号时才显示默认值
+    if (footerVersion && !footerVersion.textContent) {
+      footerVersion.textContent = 'v0.0.1';
+    }
+  }
+}
+
 const loadStatsData = async () => {
 
-	const footerVersion = document.querySelector('.dashboard-footer .footerVersion');
-	try {
-		const versionresponse = await fetch('/dashboard/api/version');
-		const Versiondata = await versionresponse.json();
-		if (footerVersion) {
-		  footerVersion.textContent = `v${Versiondata.version}`;
-		}
-	} catch (error) {
-		console.error('Failed to fetch version:', error);
-		// 返回默认值
-		footerVersion.textContent = 'v0.0.1';
-	}
+	fetchVersion();
 
 	if(ui.loadStatsDataTimeout) clearInterval(ui.loadStatsDataTimeout);
 	
