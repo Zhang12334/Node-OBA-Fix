@@ -41,7 +41,7 @@ import type {TokenManager} from './token.js'
 import type {IFileList} from './types.js'
 import {setupUpnp} from './upnp.js'
 import {checkSign, hashToFilename} from './util.js'
-import { aplPanelListener, aplPanelServe } from './dashboard/main.js';
+import { PanelListener, PanelServe } from './dashboard/main.js';
 import chalk from "chalk"
 
 interface ICounters {
@@ -219,8 +219,8 @@ export class Cluster {
     const parallel =
       config.syncConcurrency === undefined || config.syncConcurrency < 1
           ? syncConfig.concurrency
-          : config.syncConcurrency > 100
-          ? 100
+          : config.syncConcurrency > 20
+          ? 20
           : config.syncConcurrency;
 
     sync_logger.info(`同步并发数: ${parallel}`)
@@ -452,7 +452,7 @@ export class Cluster {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    aplPanelServe(app, this.storage);
+    PanelServe(app, this.storage);
     app.get('/download/:hash(\\w+)', async (req: Request, res: Response, next: NextFunction) => {
       try {
         const hash = req.params.hash.toLowerCase()
@@ -477,7 +477,7 @@ export class Cluster {
         }
         res.set('x-bmclapi-hash', hash)
         const {bytes, hits} = await this.storage.express(hashPath, req, res, next)
-        aplPanelListener(req, bytes, hits);
+        PanelListener(req, bytes, hits);
         this.counters.bytes += bytes
         this.counters.hits += hits
       } catch (err) {
