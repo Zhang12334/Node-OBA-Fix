@@ -24,6 +24,9 @@ jobs:
           - os: windows-latest
             arch: x86_64
             artifact_name: "Node-OBA-Fix-windows-x86_64.tar.gz"
+          - os: windows-latest
+            arch: aarch64
+            artifact_name: "Node-OBA-Fix-windows-aarch64.tar.gz"            
 
     runs-on: ${{ matrix.os }}
     steps:
