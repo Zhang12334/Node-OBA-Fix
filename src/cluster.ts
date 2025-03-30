@@ -463,6 +463,12 @@ export class Cluster {
 
         const hashPath = hashToFilename(hash)
         if (!(await this.storage.exists(hashPath))) {
+          // 如果不存在此文件
+          if (config.disableSyncFiles) {
+            // 如果关闭了同步文件功能, 直接404
+            return res.status(404).send('File Not Found');
+          }
+          // 尝试同步文件
           if (this.downloadPromise.has(hash)) {
             await this.downloadPromise.get(hash)
           } else {

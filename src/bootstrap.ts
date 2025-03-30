@@ -292,18 +292,22 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   const configuration = await cluster.getConfiguration();
   const files = await cluster.getFileList();
   sync_logger.info(`${files.files.length} files`);
-  try {
-    await cluster.syncFiles(files, configuration.sync);
-  } catch (e) {
-    if (e instanceof HTTPError) {
-      sync_logger.error({ url: e.response.url }, '下载失败');
-    }
-    throw e;
-  }
-  sync_logger.info('回收文件');
-  cluster.gcBackground(files);
 
+  if (!config.disableSyncFiles) {
+    // 如果没有禁用同步文件
+    try {
+      await cluster.syncFiles(files, configuration.sync);
+    } catch (e) {
+      if (e instanceof HTTPError) {
+        sync_logger.error({ url: e.response.url }, '下载失败');
+      }
+      throw e;
+    }
+    sync_logger.info('回收文件');
+    cluster.gcBackground(files);
+  }
   let checkFileInterval: NodeJS.Timeout;
+
   if (config.noENABLE) {
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
@@ -318,12 +322,13 @@ export async function bootstrap(version: string, protocol_version: string): Prom
       if (nodeCluster.isWorker && typeof process.send === 'function') {
         process.send('ready');
       }
-
-      checkFileInterval = setTimeout(() => {
-        void checkFile(files).catch((e) => {
-          logger.error(e, '文件检查失败');
-        });
-      }, ms('10m'));
+      if (!config.disableSyncFiles) {
+        checkFileInterval = setTimeout(() => {
+          void checkFile(files).catch((e) => {
+            logger.error(e, '文件检查失败');
+          });
+        }, ms('10m'));
+      }
     } catch (e) {
       logger.fatal(e);
       if (process.env.NODE_ENV === 'development') {

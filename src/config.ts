@@ -48,6 +48,7 @@ export class Config {
 
   // 同步设置项
   public readonly syncConcurrency = env.get('SYNC_CONCURRENCY').default(10).asInt()
+  public readonly disableSyncFiles = env.get('DISABLE_SYNC_FILES').asBool()
 
   // 视觉配置项
   public readonly disableOptiLog = env.get('DISABLE_OPTI_LOG').asBool()
