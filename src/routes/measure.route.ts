@@ -62,8 +62,8 @@ export default function MeasureRouteFactory(config: Config, storage: IStorage): 
         res.status(500).send('Internal Server Error');
       }
     } else {
-      // 如果不是alist，直接返回文件内容
-      // 暂时不计划为minio新增302 measure, 因为没有测试环境
+      // 如果不是 alist，直接返回文件内容
+      // 暂时不计划为 minio 新增 302 measure, 因为没有测试环境
       const buffer = Buffer.alloc(1024 * 1024, '0066ccff', 'hex');
       res.set('content-length', (size * 1024 * 1024).toString());
       for (let i = 0; i < size; i++) {
