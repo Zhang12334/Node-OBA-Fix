@@ -9,18 +9,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            arch: x64
+          - os: ubuntu-24.04
             artifact_name: "Node-OBA-Fix-linux-x64.tar.xz"
-          - os: ubuntu-latest-arm64
-            arch: arm64
-            artifact_name: "Node-OBA-Fix-linux-arm64.tar.xz"       
+
+          - os: ubuntu-24.04-arm
+            artifact_name: "Node-OBA-Fix-linux-arm64.tar.xz"  
+
+          - os: macos-13
+            artifact_name: "Node-OBA-Fix-macos-x64.tar.xz"
+
+          - os: macos-14
+            artifact_name: "Node-OBA-Fix-macos-arm64.tar.xz"            
+
           - os: windows-latest
-            arch: x64
-            artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"
-          - os: windows-latest-arm64
-            arch: arm64
-            artifact_name: "Node-OBA-Fix-windows-arm64.tar.gz"            
+            artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"           
 
     runs-on: ${{ matrix.os }}
     steps:
