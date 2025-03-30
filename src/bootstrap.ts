@@ -305,6 +305,8 @@ export async function bootstrap(version: string, protocol_version: string): Prom
     }
     sync_logger.info('回收文件');
     cluster.gcBackground(files);
+  } else {
+    logger.warn('已禁用文件同步');
   }
   let checkFileInterval: NodeJS.Timeout;
 
@@ -328,6 +330,8 @@ export async function bootstrap(version: string, protocol_version: string): Prom
             logger.error(e, '文件检查失败');
           });
         }, ms('10m'));
+      } else {
+        logger.warn('已禁用文件同步');
       }
     } catch (e) {
       logger.fatal(e);
