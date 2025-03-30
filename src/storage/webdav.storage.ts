@@ -53,7 +53,7 @@ export class WebdavStorage implements IStorage {
 
   public async init(): Promise<void> {
     if (!(await this.client.exists(this.basePath))) {
-      logger.info(`create base path: ${this.basePath}`)
+      logger.info(`已创建路径: ${this.basePath}`)
       await this.client.createDirectory(this.basePath, {recursive: true})
     }
   }

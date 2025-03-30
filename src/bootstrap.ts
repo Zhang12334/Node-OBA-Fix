@@ -59,6 +59,24 @@ async function checkUpdate(): Promise<void> {
   }
 }
 
+// 检查文件是否已存在
+async function checkFileExists(url: string): Promise<boolean> {
+  try {
+    await got.head(url, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${davStorageUrl.username}:${davStorageUrl.password}`).toString('base64')}`
+      },
+      https: { rejectUnauthorized: false }
+    });
+    return true; // 文件存在
+  } catch (error: any) {
+    if (error.response?.statusCode === 404) {
+      return false; // 文件不存在
+    }
+    throw error; // 其他错误
+  }
+}
+
 // 解析 markdown 文本
 function parseMarkdownAndLog(body: string): void {
   const lines = body.split("\r\n").filter(line => line.trim() !== "");
@@ -100,11 +118,16 @@ function isVersionGreater(latestVersion: string, currentVersion: string): boolea
   return false;
 }
 
-async function createAndUploadFileToAlist(size: number): Promise<string> {
+async function createAndUploadFileToAlist(size: number) {
   const content = Buffer.alloc(size * 1024 * 1024, '0066ccff', 'hex');
   const uploadUrl = `${davBaseUrl}/measure/${size}MB`;
 
   try {
+    const fileExists = await checkFileExists(uploadUrl);
+    if (fileExists) {
+      logger.debug(`测速文件已存在，跳过上传: ${uploadUrl}`);
+      return;
+    }
     await got.put(uploadUrl, {
       body: content,
       headers: {
@@ -122,7 +145,7 @@ async function createAndUploadFileToAlist(size: number): Promise<string> {
     }
     throw uploadError;
   }
-  return uploadUrl;
+  return;
 }
 
 export async function bootstrap(version: string, protocol_version: string): Promise<void> {
