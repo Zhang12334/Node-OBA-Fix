@@ -3,7 +3,7 @@ import { logger } from './logger.js';  // 导入日志
 
 class Webhook {
     private url = config.webhookUrl;
-    private clusterName = `[${config.clusterName}]` || "[Node-OpenBMCLAPI-Fix]";
+    private clusterName = `[${config.clusterName}]` || "[Cluster]";
 
     public async send(message: string): Promise<void> {
         if (!this.url) {

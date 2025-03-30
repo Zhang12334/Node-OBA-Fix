@@ -67,7 +67,7 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 
 ## 所需环境
 
-- Node.js 20 以上
+- Node.js 20 及以上
 - 一个支持 Node.js 的系统
 - 一个支持 Node.js 的架构
 
