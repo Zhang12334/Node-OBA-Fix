@@ -45,7 +45,7 @@ jobs:
           cp $(which node) .
           cp platforms/linux/run.sh .
           tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
-        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
+        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos') || contains(matrix.os, 'self-hosted')
 
       ## Windows
       - run: |
