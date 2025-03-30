@@ -13,35 +13,13 @@ const Config = {
 	enableWebPanel: true,
 	allowRobots: false,
 	webNodeIdx: -1,
-	webNodes: [],
 	nodeIds: [],
 };
 (async () => {
 	const addrFilePath = path.resolve('./data/dashboard/config.json');
 	if(existsSync(addrFilePath)){
 		const cfg = JSON.parse(readFileSync(addrFilePath, { encoding: 'utf8' }));
-
 		Config.config = cfg;
-
-		if(cfg.nodes){
-			let idx = 0;
-			for(const nodeId in cfg.nodes){
-				const node = cfg.nodes[nodeId];
-
-				if(nodeId === process.env.CLUSTER_ID){
-					if(node.enable === false) Config.enableWebPanel = false;
-					if(node.allowRobots === true) Config.allowRobots = true;
-					Config.webNodeIdx = idx;
-				}
-
-				Config.webNodes.push({
-					title: node.title,
-					name: node.name,
-				});
-				Config.nodeIds.push(nodeId);
-				idx++;
-			}
-		}
 	}
 
 	Config.config.dataPath ??= './data/dashboard';
@@ -169,7 +147,7 @@ const dataPath = path.resolve(Config.config.dataPath);
 		if(statsData._worker.mainThread === ThreadTime){
 
 			ThreadModeMain = true;
-			// console.log(`[AplPanel] 保存统计数据`, new Date());
+			dash_logger.debug(`正在保存统计数据`, new Date());
 
 			// 收集同步线程的数据
 			addObjValueNumber(statsDataTemp, statsData._worker.syncData);
@@ -192,9 +170,9 @@ const dataPath = path.resolve(Config.config.dataPath);
 
 		}else{
 
-			if(ThreadModeMain) dash_logger.debug(`${ThreadTime} 将作为同步线程运行`);
+			if (ThreadModeMain) dash_logger.debug(`${ThreadTime} 将作为同步线程运行`);
 			ThreadModeMain = false;
-			// console.log(`[AplPanel] 同步统计数据`, new Date());
+			dash_logger.debug(`正在同步统计数据`, new Date());
 
 			// 仅同步
 			addObjValueNumber(statsData._worker.syncData, statsDataTemp, true);
@@ -237,16 +215,16 @@ const dataPath = path.resolve(Config.config.dataPath);
 
 
 
-// 添加导入 `import { aplPanelListener, aplPanelServe } from '../aplPanel/main.js';`
+// 添加导入 `import { PanelListener, PanelServe } from '../aplPanel/main.js';`
 
 /**
  * 添加到代码之后 cluster.js, `const { bytes, hits } = await this.storage.express(hashPath, req, res, next);`
- *   - `aplPanelListener(req, bytes, hits);`
+ *   - `PanelListener(req, bytes, hits);`
  * @param {import('express').Request} req
  * @param {number} bytes - 这个文件的大小
  * @param {number} hits - 命中次数 / 是否命中
  */
-export const aplPanelListener = async (req, bytes, hits) => {
+export const PanelListener = async (req, bytes, hits) => {
 	try{
 		statsDataTemp.hits += hits;
 		statsDataTemp.bytes += bytes;
@@ -278,11 +256,11 @@ export const aplPanelListener = async (req, bytes, hits) => {
 
 /**
  * 添加到代码之前 cluster.js, `app.get('/download/:hash(\\w+)', async (req, res, next) => {`
- *   - `aplPanelServe(app);`
+ *   - `PanelServe(app);`
  * @param {import('express').Application} _app
  * @param {Object} _storage
  */
-export const aplPanelServe = (_app, _storage) => {
+export const PanelServe = (_app, _storage) => {
 	dash_logger.info(`正在启动面板服务`);
 
 	_app.use('/', express.static(path.resolve('./dist/dashboard/public'), {
@@ -323,104 +301,12 @@ export const aplPanelServe = (_app, _storage) => {
 	});
 
 	_app.get('/dashboard/api/stats', async (req, res, next) => {
-
-		// ./api/stats?idx=
-		const inp = {
-			idx: Number(req.query?.idx ?? Config.webNodeIdx),
-		};
-
-		/**
-		 * 获取一个本地或远程节点的数据
-		 * @param {String} nodeId - 节点id
-		 */
-		const getNodeStatsData = async (nodeId) => {
-			try{
-				const url = Config.config.nodes[nodeId]?.url;
-				if(url){
-					const res = await fetch(`${url.replace(/\/$/, '')}/dashboard/api/stats?idx=-1`);
-					const data = await res.json();
-					return data.statsData;
-				}else{
-					return JSON.parse(await readFile(path.join(dataPath, `./stats_${nodeId}.json`), { encoding: 'utf8' }));
-				}
-			}catch(err){
-				dash_logger.error(`读取其他节点统计数据时出错 [${nodeId}]:`, err);
-				return null;
-			}
-		};
-
-		if(inp.idx !== Config.webNodeIdx && Config.nodeIds[inp.idx]){
-			// 提供其他节点的数据
-			try{
-
-				// 提供所有节点的数据
-				if(Config.nodeIds[inp.idx] === '_ALL_'){
-					// 读取所有节点的信息
-					for(let idx = 0; idx < Config.nodeIds.length; idx++){
-						if(nodeDataCache[idx]){
-							continue;
-						}
-						if(idx === Config.webNodeIdx){
-							continue;
-						}
-						const nodeId = Config.nodeIds[idx];
-						if(nodeId.length !== 24){
-							continue;
-						}
-						const sd = await getNodeStatsData(nodeId);
-						if(!sd){
-							continue;
-						}
-						nodeDataCache[idx] = sd;
-						scrollingUpdateStatsData(nodeDataCache[idx]);
-					}
-					// 合并数据
-					if(nodeDataCache_all === null){
-						nodeDataCache_all = structuredClone(statsData);
-						for(const nodeDataIdx in nodeDataCache){
-							addObjValueNumber(nodeDataCache_all.hours, nodeDataCache[nodeDataIdx].hours);
-							addObjValueNumber(nodeDataCache_all.months, nodeDataCache[nodeDataIdx].months);
-							addObjValueNumber(nodeDataCache_all.years, nodeDataCache[nodeDataIdx].years);
-							addObjValueNumber(nodeDataCache_all.heatmap, nodeDataCache[nodeDataIdx].heatmap);
-							addObjValueNumber(nodeDataCache_all.all, nodeDataCache[nodeDataIdx].all);
-						}
-					}
-					res.json({
-						statsData: nodeDataCache_all,
-						webNodes: Config.webNodes,
-						webNodeIdx: inp.idx,
-					});
-					return;
-				}
-
-				// 提供其他节点的数据
-				if(!nodeDataCache[inp.idx]){
-					const sd = await getNodeStatsData(Config.nodeIds[inp.idx]);
-					if(!sd){
-						res.json(null);
-						return;
-					}
-					nodeDataCache[inp.idx] = sd;
-					scrollingUpdateStatsData(nodeDataCache[inp.idx]);
-				}
-				res.json({
-					statsData: nodeDataCache[inp.idx],
-					webNodes: Config.webNodes,
-					webNodeIdx: inp.idx,
-				});
-			}catch(err){
-				dash_logger.error(`处理其他节点统计数据时出错`, err);
-				res.json(null);
-			}
-		}else{
-			// 提供当前节点的数据
-			res.json({
-				statsData: statsData,
-				statsDataTemp: statsDataTemp,
-				webNodes: Config.webNodes,
-				webNodeIdx: Config.webNodeIdx,
-			});
-		}
+		// 提供当前节点的数据
+		res.json({
+			statsData: statsData,
+			statsDataTemp: statsDataTemp,
+			webNodeIdx: Config.webNodeIdx,
+		});
 	});
 	dash_logger.info(`API已启用`);
 };
