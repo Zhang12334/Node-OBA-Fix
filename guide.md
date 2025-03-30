@@ -12,6 +12,8 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 
 # 配置
 
+## 原版配置项
+
 | 环境变量                    | 必填 | 默认值                  | 说明                                                                                                                                          |
 |----------------------------|------|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | CLUSTER_ID                 |  是  | -                      | 集群 ID                                                                                                                                       |
@@ -25,25 +27,31 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | ENABLE_NGINX               |  否  | false                  | 使用 nginx 提供文件服务                                                                                                                         |
 | DISABLE_ACCESS_LOG         |  否  | false                  | 禁用访问日志输出                                                                                                                                |
 | ENABLE_UPNP                |  否  | false                  | 启用 UPNP 端口映射                                                                                                                             |
+| LOGLEVEL                   |  否  | info                   | 切换日志等级                                                                                                                                   |
+| NO_DAEMON                  |  否  | false                  | 是否禁用子进程模式(推荐设置为false即不禁用, 禁用后无法使用自动重启或退出前延迟功能)                                                                 |
+
+## 新增配置项
+
+| 环境变量                    | 必填 | 默认值                  | 说明                                                                                                                                          |
+|----------------------------|------|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | RESTART_PROCESS            |  否  | true                   | 在当前进程意外退出后调用自身功能自动重启进程                                                                                                      |
 | ENABLE_EXIT_DELAY          |  否  | false                  | 使用自定义固定秒数而非内置退避策略的重启前等待时间                                                                                                |
 | EXIT_DELAY                 |  否  | 3                      | 在重启/退出前进行自定义秒数的延迟                                                                                                                |
-| LOGLEVEL                   |  否  | info                   | 切换日志等级                                                                                                                                   |
-| NO_DAEMON                  |  否  | false                  | 是否禁用子进程模式(推荐设置为false即不禁用, 禁用后无法使用自动重启或退出前延迟功能)                                                                 |
+| CLUSTER_NO_ENABLE          |  否  | false                  | 是否禁用节点上线（会正常走开启流程、同步，但不会请求上线，一般用于调试或同步文件，请勿在生产环境中使用）                                               |
 | STARTUP_LIMIT              |  否  | 90                     | 24h启动的最多次数(以请求上线次数为准, 超过后将定时刷新，等待24h内上线次数不超限时再启动，避免被主控封禁)                                              |
 | STARTUP_LIMIT_WAIT_TIMEOUT |  否  | 600                    | 上线次数超限时等待响应的超时时间, 单位为秒, 一般10分钟即可无需修改                                                                                 |
-| CLUSTER_NO_ENABLE          |  否  | false                  | 是否禁用节点上线（会正常走开启流程、同步，但不会请求上线，一般用于调试或同步文件，请勿在生产环境中使用）                                               |
 | WEBHOOK_RECONNECT          |  否  | false                  | 是否启用节点重连时触发的 Webhook                                                                                                                 |
 | WEBHOOK_STARTUP            |  否  | false                  | 是否启用节点上线时触发的 Webhook                                                                                                                 |
 | WEBHOOK_SHUTDOWN           |  否  | false                  | 是否启用节点下线时触发的 Webhook                                                                                                                 |
 | WEBHOOK_ERROR              |  否  | false                  | 是否启用节点工作进程异常退出时触发的 Webhook                                                                                                      |
 | 对应webhook配置项_MESSAGE   |  否  | -                      | 自定义触发 Webhook 时发送的消息，如：WEBHOOK_ERROR_MESSAGE / WEBHOOK_SHUTDOWN_MESSAGE                                                            |
 | WEBHOOK_URL                |  否  | -                      | Webhook URL，如：WEBHOOK_URL=http://127.0.0.1:8080/webhook                                                                                     |
+| CLUSTER_NAME               |  否  | Cluster                | 自定义节点名称, 目前会在同步、webhook时应用: 同步文件显示为 [Sync-节点名称], webhook显示为 [Cluster] 节点已下线                                      |
 | SYNC_CONCURRENCY           |  否  | -                      | 同步文件时并发数量，默认从主控获取（注：此配置项主要为主控不下发20并发的情况提供保底，因此设置的上限值为20，设置超过20时默认取最高值20）                  |
 | NO_CONNECT                 |  否  | false                  | 禁用连接主控功能（也不会请求证书）（可配合CLUSTER_NO_ENABLE+自定义证书搭建针对单节点多线的多端负载均衡）                                              |
 | DISABLE_OPTI_LOG           |  否  | false                  | 显示未优化的日志（请求地址会显示?后的部分，如优化后/measure/1，优化前/measure/1?s=w4Yh2cnF6Ctmo4CwUxZve2jN1UU&e=m8u973ob）                          |
 | DISABLE_NEW_SYNC_STATUS    |  否  | false                  | 禁用新的同步状态显示，会显示单个文件的下载进度显示并更改为原版的排版                                                                                 |
-| CLUSTER_NAME               |  否  | Cluster                | 自定义节点名称, 目前会在同步、webhook时应用: 同步文件显示为 [Sync-节点名称], webhook显示为 [Cluster] 节点已下线                                      |
+| DISABLE_SYNC_FILES         |  否  | false                  | 禁用同步文件功能（警告：此功能为多端单节点设计，请勿在任何单端单存储的节点上使用，将会导致节点出现缺少大量文件的情况，并扣光信任值然后被ban）              |
 
 备注：Webhook 的整体结构为 `[节点名称] 消息内容`，如：`[Cluster] 节点已下线`、`[Cluster] 节点已重连`
 
