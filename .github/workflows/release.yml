@@ -12,7 +12,7 @@ jobs:
           - os: ubuntu-24.04
             artifact_name: "Node-OBA-Fix-linux-x64.tar.xz"
 
-          - os: Onecloud
+          - os: self-hosted 
             artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"
 
           - os: ubuntu-24.04-arm
