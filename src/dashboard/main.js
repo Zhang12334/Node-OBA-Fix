@@ -7,6 +7,7 @@ import path from 'path';
 import { deviceList, sleep, resetStatsDataTemp, addObjValueNumber, getNowStatsDataDate, deepMergeObject } from './util.js';
 import { dash_logger } from '../logger.js';
 import { config } from '../config.js';
+import { isIPv4, isIPv6 } from 'net';
 
 const Config = {
 	config: {},
@@ -30,7 +31,6 @@ const statsDataTemp = {
 	network: {
 		v4: 0,
 		v6: 0,
-		none: 0,
 	},
 };
 for(const deviceName in deviceList){
@@ -40,6 +40,16 @@ for(const deviceName in deviceList){
 }
 
 let statsData;
+
+function extractIPv4FromIPv6(ip) {
+	if (ip.startsWith('::ffff:')) {
+	  const ipv4Part = ip.substring(7); // Remove "::ffff:"
+	  if (isIPv4(ipv4Part)) {
+		return ipv4Part;
+	  }
+	}
+	return null;
+}
 
 // 滚动更新数据列表
 const scrollingUpdateStatsData = (sd) => {
@@ -237,14 +247,24 @@ export const PanelListener = async (req, bytes, hits) => {
 
 		const ip = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.ip;
 		if(!ip){
-			statsDataTemp.network.none ++;
+			statsDataTemp.network.v4 ++;
 			return;
 		}
 
-		if(`${ip}`.indexOf('.')){
+		// 解析IP
+		let ipToUse = ip;
+		const extractedIPv4 = extractIPv4FromIPv6(ip);
+		if (extractedIPv4) {
+		  ipToUse = extractedIPv4;
+		}		
+
+		if (isIPv4(ipToUse)) {
 			statsDataTemp.network.v4 ++;
-		}else{
+		} else if (isIPv6(ipToUse)) {
 			statsDataTemp.network.v6 ++;
+		} else {
+			// 如果既不是 IPv4 也不是 IPv6，爆！
+			dash_logger.error(`未知的IP类型: ${ipToUse}`);
 		}
 		
 	} catch(err) {

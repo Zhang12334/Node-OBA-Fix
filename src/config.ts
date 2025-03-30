@@ -41,6 +41,9 @@ export class Config {
   public readonly sslCert = env.get('SSL_CERT').asString()
 
   public readonly flavor: IConfigFlavor
+
+  // 调试选项
+  public readonly allowNoSign = env.get('ALLOW_NO_SIGN').asBool()
   
   // 版本
   public readonly protocol_version = packageJson.protocol_version
