@@ -380,6 +380,7 @@ const ui = {
 
 // 获取页脚版本号显示元素
 const footerVersion = document.querySelector('.dashboard-footer .footerVersion');
+
 // 标记是否已成功获取过版本号
 let isVersionFetched = false;
 
