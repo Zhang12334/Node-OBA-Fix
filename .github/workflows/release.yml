@@ -46,7 +46,7 @@ jobs:
       - name: Test
         if: matrix.arch == 'armv7' || matrix.arch == 'armv7l'
         run: |
-          echo "Current system architecture: $(uname -m)"
+          node -p "process.arch"
 
       - uses: actions/setup-node@v4
         with:
