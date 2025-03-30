@@ -10,18 +10,23 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
+            name: "Linux x86_64"
             artifact_name: "Node-OBA-Fix-linux-x64.tar.xz"
 
           - os: ubuntu-24.04-arm
+            name: "Linux arm64"
             artifact_name: "Node-OBA-Fix-linux-arm64.tar.xz"  
 
           - os: macos-13
+            name: "MacOS x86_64"
             artifact_name: "Node-OBA-Fix-macos-x64.tar.xz"
 
           - os: macos-14
+            name: "MacOS arm64"
             artifact_name: "Node-OBA-Fix-macos-arm64.tar.xz"            
 
           - os: windows-latest
+            name: "Windows x86_64"
             artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"           
 
     runs-on: ${{ matrix.os }}
