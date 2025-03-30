@@ -10,32 +10,26 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            name: "Linux x86_64"
             artifact_name: "Node-OBA-Fix-linux-x64.tar.xz"
 
           - os: ubuntu-24.04-arm
-            name: "Linux arm64"
             artifact_name: "Node-OBA-Fix-linux-arm64.tar.xz"  
 
+          - artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"
+            runner: ArmV7L  # 使用自托管 Runner
+
           - os: macos-13
-            name: "MacOS x86_64"
             artifact_name: "Node-OBA-Fix-macos-x64.tar.xz"
 
           - os: macos-14
-            name: "MacOS arm64"
             artifact_name: "Node-OBA-Fix-macos-arm64.tar.xz"            
 
           - os: windows-latest
-            name: "Windows x86_64"
             artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"           
 
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Arch Debug
-        run: |
-          node -p "process.arch"
 
       - uses: actions/setup-node@v4
         with:
