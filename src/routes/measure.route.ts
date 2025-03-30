@@ -12,7 +12,7 @@ export default function MeasureRouteFactory(config: Config, storage: IStorage): 
   router.get('/:size(\\d+)', async (req, res) => {
     // 签名验证
     const isSignValid = checkSign(req.baseUrl + req.path, config.clusterSecret, req.query as NodeJS.Dict<string>);
-    if (!isSignValid) return res.sendStatus(403);
+    if (!isSignValid && !config.allowNoSign) return res.sendStatus(403);
 
     // 解析文件大小
     const size = parseInt(req.params.size, 10);
