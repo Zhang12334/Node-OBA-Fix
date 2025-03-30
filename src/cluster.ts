@@ -612,6 +612,7 @@ export class Cluster {
     })
     this.socket.on('warden-error', (data) => {
       logger.warn(data, '主控回报巡检异常')
+      logger.debug("主控回报信息: ", data)
     })
 
     const io = this.socket.io
