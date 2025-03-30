@@ -191,7 +191,7 @@ async function downloadAndUpdate(latestVersion: string): Promise<void> {
     // 安装依赖
     await new Promise((resolve, reject) => {
       logger.info(colors.green(`正在安装依赖`));
-      exec('npm install', (error, stdout, stderr) => {
+      exec('npm -registry https://npmreg.proxy.ustclug.org/ install', (error, stdout, stderr) => {
         if (error) {
           reject(new Error(`npm install 失败: ${stderr}`));
         } else {
