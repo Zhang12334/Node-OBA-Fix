@@ -12,8 +12,6 @@ const Config = {
 	config: {},
 	enableWebPanel: true,
 	allowRobots: false,
-	webNodeIdx: -1,
-	nodeIds: [],
 };
 (async () => {
 	const addrFilePath = path.resolve('./data/dashboard/config.json');
@@ -305,7 +303,6 @@ export const PanelServe = (_app, _storage) => {
 		res.json({
 			statsData: statsData,
 			statsDataTemp: statsDataTemp,
-			webNodeIdx: Config.webNodeIdx,
 		});
 	});
 	dash_logger.info(`API已启用`);
