@@ -11,7 +11,9 @@ import {logger} from './logger.js'
 export class Keepalive {
   public timer?: NodeJS.Timeout
   private socket?: Socket
-  private keepAliveError = 0
+  private keepAliveErrors: number[] = []; // 记录失败时间戳
+  private readonly MAX_KEEP_ALIVE_FAILURES = 3; // 最大允许失败次数
+  private readonly FAILURE_WINDOW_MS = 5 * 60 * 1000; // 5分钟时间窗口
 
   constructor(
     private readonly interval: number,
@@ -41,22 +43,42 @@ export class Keepalive {
 
   private async emitKeepAlive(): Promise<void> {
     try {
+      // 执行保活检测（15s超时）
       const status = await pTimeout(this.keepAlive(), {
-        milliseconds: ms('10s'),
-      })
+        milliseconds: ms('15s'),
+      });
+  
+      // 主控踹下线
       if (!status) {
-        logger.fatal('节点被主控踢下线')
-        return await this.restart()
+        logger.fatal('节点被主控踢下线');
+        return await this.restart(); // 立即重启
       }
-      this.keepAliveError = 0
+  
+      // 保活成功时清除历史错误记录
+      this.keepAliveErrors = [];
+      
     } catch (e) {
-      this.keepAliveError++
-      logger.error(e, '保活失败')
-      if (this.keepAliveError >= 3) {
-        await this.restart()
+      const now = Date.now();
+
+      // 删去旧记录
+      this.keepAliveErrors = this.keepAliveErrors.filter(
+        timestamp => now - timestamp <= this.FAILURE_WINDOW_MS
+      );
+  
+      // 写入本次失败时间戳
+      this.keepAliveErrors.push(now);
+      logger.error(e, `保活失败（失败 ${this.keepAliveErrors.length}/${this.MAX_KEEP_ALIVE_FAILURES} 次）`);
+  
+      // 判断是否重启
+      if (this.keepAliveErrors.length >= this.MAX_KEEP_ALIVE_FAILURES) {
+        logger.error(`5分钟内保活失败${this.MAX_KEEP_ALIVE_FAILURES}次, 正在重启Cluster`);
+        await this.restart();
+        this.keepAliveErrors = []; // 重启后清空记录
       }
+  
     } finally {
-      void this.schedule()
+      // 无论成功失败都调度下一次保活
+      void this.schedule();
     }
   }
 
