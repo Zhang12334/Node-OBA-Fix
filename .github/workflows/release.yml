@@ -12,30 +12,19 @@ jobs:
           - os: ubuntu-latest
             arch: x64
             artifact_name: "Node-OBA-Fix-linux-x64.tar.xz"
-          - os: ubuntu-latest
+          - os: ubuntu-latest-arm64
             arch: arm64
             artifact_name: "Node-OBA-Fix-linux-arm64.tar.xz"       
-          - os: macos-latest
-            arch: x64
-            artifact_name: "Node-OBA-Fix-macos-x64.tar.xz"
-          - os: macos-latest
-            arch: arm64
-            artifact_name: "Node-OBA-Fix-macos-arm64.tar.xz"
           - os: windows-latest
             arch: x64
             artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"
-          - os: windows-latest
+          - os: windows-latest-arm64
             arch: arm64
             artifact_name: "Node-OBA-Fix-windows-arm64.tar.gz"            
 
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
-      # QEMU arm
-      - name: Set up QEMU
-        if: matrix.arch == 'armv7' || matrix.arch == 'armv7l'
-        uses: docker/setup-qemu-action@v3
 
       - name: Arch Debug
         run: |
