@@ -77,8 +77,10 @@ jobs:
         run: |
           zip -r update.zip dist package.json
 
-      - name: "Upload update.zip"
+      - name: "Upload files"
         uses: actions/upload-artifact@v4
         with:
-          name: update.zip
-          path: update.zip
+          name: update
+          path: |
+            dist
+            package.json
