@@ -457,7 +457,7 @@ export class Cluster {
       try {
         const hash = req.params.hash.toLowerCase()
         const signValid = checkSign(hash, this.clusterSecret, req.query as NodeJS.Dict<string>)
-        if (!signValid) {
+        if (!signValid && !config.allowNoSign) {
           return res.status(403).send('invalid sign')
         }
 

@@ -53,6 +53,7 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | DISABLE_NEW_SYNC_STATUS    |  否  | false                  | 禁用新的同步状态显示，会显示单个文件的下载进度显示并更改为原版的排版                                                                                 |
 | DISABLE_SYNC_FILES         |  否  | false                  | 禁用同步文件功能（警告：此功能为多端单节点设计，请勿在任何单端单存储的节点上使用，将会导致节点出现缺少大量文件的情况，并扣光信任值然后被ban）              |
 | ENABLE_AUTO_UPDATE         |  否  | false                  | 是否启用自动更新功能（默认为禁用，启用后程序会自动检查更新并下载更新文件，更新完成后程序会自动重启，需本地有>10版本的NPM环境）                            |
+| ALLOW_NO_SIGN              |  否  | false                  | 是否允许未签名的请求                                                                                                                             |
 
 备注：Webhook 的整体结构为 `[节点名称] 消息内容`，如：`[Cluster] 节点已下线`、`[Cluster] 节点已重连`
 
