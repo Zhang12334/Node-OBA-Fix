@@ -43,8 +43,7 @@ jobs:
         if: matrix.arch == 'armv7' || matrix.arch == 'armv7l'
         uses: docker/setup-qemu-action@v3
 
-      - name: Test
-        if: matrix.arch == 'armv7' || matrix.arch == 'armv7l'
+      - name: Arch Debug
         run: |
           node -p "process.arch"
 
