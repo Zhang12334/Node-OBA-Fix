@@ -46,6 +46,9 @@ export class Config {
   public readonly protocol_version = packageJson.protocol_version
   public readonly version = packageJson.version
 
+  // 更新
+  public readonly enableAutoUpdate = env.get('ENABLE_AUTO_UPDATE').asBool()
+
   // 同步设置项
   public readonly syncConcurrency = env.get('SYNC_CONCURRENCY').default(10).asInt()
   public readonly disableSyncFiles = env.get('DISABLE_SYNC_FILES').asBool()

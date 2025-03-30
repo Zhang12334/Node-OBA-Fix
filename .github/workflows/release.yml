@@ -59,3 +59,26 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_name }}
+
+  build-update-zip:
+    name: "Build Update Zip"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm i --no-package-lock
+      - run: npm run build
+
+      - name: "Create update.zip"
+        run: |
+          zip -r update.zip dist package.json
+
+      - name: "Upload update.zip"
+        uses: actions/upload-artifact@v4
+        with:
+          name: update.zip
+          path: update.zip

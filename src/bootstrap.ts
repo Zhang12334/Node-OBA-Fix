@@ -32,33 +32,6 @@ function filterRecentStartupTimes(startupTimes: number[]): number[] {
   return startupTimes.filter((timestamp) => now - timestamp <= twentyFourHoursInMs);
 }
 
-// 检查更新
-async function checkUpdate(): Promise<void> {
-  logger.info(colors.green(`正在检查更新`));
-  const currentVersion = config.version;
-  const latestVersionUrl = "https://api.github.com/repos/Zhang12334/Node-OBA-Fix/releases/latest";
-  const response = await fetch(latestVersionUrl, {
-    headers: { "User-Agent": "Mozilla/5.0" }
-  });
-  const data = await response.json() as { tag_name: string; body: string };
-  const latestVersion = data.tag_name; // 获取最新版本
-
-  if (!latestVersion) {
-      logger.warn("检查更新失败！");
-      return;
-  }
-
-  if (isVersionGreater(latestVersion, currentVersion)) {
-      logger.warn(`发现新版本: ${latestVersion}`);
-      logger.warn(`更新内容如下`);
-      parseMarkdownAndLog(data.body);
-      logger.warn(`下载地址: https://github.com/Zhang12334/Node-OBA-Fix/releases/latest`);
-      logger.warn("旧版本可能会导致问题，请尽快更新！");
-  } else {
-      logger.info("当前已是最新版本！");
-  }
-}
-
 // 检查文件是否已存在
 async function checkFileExists(url: string): Promise<boolean> {
   try {
@@ -75,47 +48,6 @@ async function checkFileExists(url: string): Promise<boolean> {
     }
     throw error; // 其他错误
   }
-}
-
-// 解析 markdown 文本
-function parseMarkdownAndLog(body: string): void {
-  const lines = body.split("\r\n").filter(line => line.trim() !== "");
-
-  let lastPrefix = ""; // 记录上一行的前缀
-  for (const line of lines) {
-      let output = "";
-
-      if (line.startsWith("# ")) {
-          // 标题
-          lastPrefix = "🔹";
-          output = `${lastPrefix} **${line.replace(/^# /, "")}**`;
-      } else if (line === "---") {
-          // 分割线
-          lastPrefix = "---";
-          output = "---";
-      } else {
-          // 普通文本，继承前面一行的前缀
-          lastPrefix = lastPrefix || "-"; // 如果前面没有前缀，则默认用 `-`
-          output = `${lastPrefix} ${line}`;
-      }
-
-      logger.warn(output);
-  }
-}
-
-
-// 版本比较
-function isVersionGreater(latestVersion: string, currentVersion: string): boolean {
-  const v1Parts = latestVersion.split(".").map(Number);
-  const v2Parts = currentVersion.split(".").map(Number);
-
-  for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
-      const v1Part = v1Parts[i] ?? 0;
-      const v2Part = v2Parts[i] ?? 0;
-      if (v1Part > v2Part) return true;
-      if (v1Part < v2Part) return false;
-  }
-  return false;
 }
 
 async function createAndUploadFileToAlist(size: number) {
@@ -154,8 +86,6 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   logger.info(colors.green(`协议版本: ${protocol_version}`));
   logger.debug(colors.yellow(`已开启debug日志`));
   logger.debug(colors.yellow(`已开启Webhook功能`));
-
-  checkUpdate().catch(console.error);
 
   const startupFilePath = join('data', 'startup.json');
 
