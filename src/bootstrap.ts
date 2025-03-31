@@ -143,7 +143,7 @@ export async function bootstrap(version: string, protocol_version: string): Prom
           if (isExceedLimit(startupTimes, startuplimit)) {
             logger.warn(`24h 内上线次数超过 ${startuplimit} 次, 已取消启动`);
             clearInterval(interval); // 停止定时器
-            reject(new Error('启动次数超限')); // 拒绝 Promise
+            reject(new Error('启动次数超限')); // 拒绝 Promise 
           } else {
             resolve(); // 检查通过，启动!
           }
