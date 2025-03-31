@@ -224,8 +224,6 @@ export class Cluster {
     
     sync_logger.info(`同步源: ${syncConfig.source}`)
     sync_logger.info(`同步并发数: ${parallel}`)
-    sync_logger.info(`节点信息: ${config.clusterName || 'Cluster'}`)
-
 
     let newmultibar: any;
     let oldmultibar: any;
