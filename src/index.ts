@@ -5,7 +5,7 @@ import ms from 'ms'
 import {fileURLToPath} from 'url'
 import {bootstrap} from './bootstrap.js'
 import {logger} from './logger.js'
-import {webhook} from './webhook.js'
+import {notify} from './notify.js'
 import {config} from './config.js'
 import colors from 'colors/safe.js';
 import path from 'path';
@@ -232,8 +232,8 @@ function forkWorker(): void {
 
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`)  
 
-      if (config.enableWebhookError) {
-        webhook.send(config.WebhookErrorMessage || `工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`); 
+      if (config.notifyEnabled) {
+        notify.send(config.notifyErrorMessage || `工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`); 
       }
 
       // 延迟
@@ -248,8 +248,8 @@ function forkWorker(): void {
 
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`)
 
-      if (config.enableWebhookError) {
-        webhook.send(config.WebhookErrorMessage || `工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`); 
+      if (config.notifyEnabled) {
+        notify.send(config.notifyErrorMessage || `工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`); 
       }
 
       setTimeout(() => forkWorker(), delay)

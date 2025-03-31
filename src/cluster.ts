@@ -32,7 +32,7 @@ import {FileListSchema} from './constants.js'
 import {validateFile} from './file.js'
 import {Keepalive} from './keepalive.js'
 import {logger, sync_logger} from './logger.js'
-import {webhook} from './webhook.js'
+import {notify} from './notify.js'
 import {beforeError} from './modules/got-hooks.js'
 import {AuthRouteFactory} from './routes/auth.route.js'
 import MeasureRouteFactory from './routes/measure.route.js'
@@ -630,8 +630,8 @@ export class Cluster {
           this.enable()
             .then(() => {
               logger.info('重试连接并且准备就绪');
-              if (config.enableWebhookReconnect) {
-                  webhook.send(config.WebhookReconnectMessage || "节点已重新连接"); 
+              if (config.notifyReconnect) {
+                notify.send(config.notifyReconnectMessage || "节点已重新连接"); 
               }
             })
             .catch(this.onConnectionError.bind(this, 'reconnect'))
@@ -681,8 +681,8 @@ export class Cluster {
       throw new Error('节点禁用失败')
     }
     this.socket?.disconnect()
-    if (config.enableWebhookShutdown) {
-      webhook.send(config.WebhookShutdownMessage || "节点已下线"); 
+    if (config.notifyShutdown) {
+      notify.send(config.notifyShutdownMessage || "节点已下线"); 
     }
   }
 
@@ -831,8 +831,8 @@ export class Cluster {
     }
 
     logger.info(colors.rainbow('开始提供服务'))
-    if (config.enableWebhookStartUP) {
-      webhook.send(config.WebhookStartUPMessage || "节点已上线"); 
+    if (config.notifyStartup) {
+      notify.send(config.notifyStartupMessage || "节点已上线"); 
     }
     this.keepalive.start(this.socket)
   }
