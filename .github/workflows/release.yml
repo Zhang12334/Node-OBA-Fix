@@ -1,6 +1,9 @@
 name: "Release Binary"
 
-on: push
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # 仅当推送的标签以 'v' 开头时触发（例如 v1.0.0）
 
 jobs:
   build-tar-ball:
@@ -94,3 +97,25 @@ jobs:
           path: |
             dist
             package.json
+
+  upload-to-release:
+    name: "Upload to Release"
+    runs-on: ubuntu-latest
+    needs: [build-tar-ball, build-update-zip]
+    steps:
+      - name: "Download Artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: "Upload to Release"
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/Node-OBA-Fix-linux-x64.tar.xz
+            artifacts/Node-OBA-Fix-linux-arm64.tar.xz
+            artifacts/Node-OBA-Fix-macos-x64.tar.xz
+            artifacts/Node-OBA-Fix-macos-arm64.tar.xz
+            artifacts/Node-OBA-Fix-windows-x64.tar.gz
+            artifacts/Node-OBA-Fix-linux-armv7l.tar.xz
+            artifacts/update.zip            
