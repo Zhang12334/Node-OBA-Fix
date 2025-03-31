@@ -27,9 +27,7 @@ jobs:
           - os: windows-latest
             artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"
                  
-          # 自托管 runner, 构建 Onecloud ArmV7L 镜像
-          - os: self-hosted
-            artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
+         
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -105,17 +103,15 @@ jobs:
     steps:
       - name: "Download Artifacts"
         uses: actions/download-artifact@v4
-        with:
-          path: artifacts
 
       - name: "Upload to Release"
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/Node-OBA-Fix-linux-x64.tar.xz
-            artifacts/Node-OBA-Fix-linux-arm64.tar.xz
-            artifacts/Node-OBA-Fix-macos-x64.tar.xz
-            artifacts/Node-OBA-Fix-macos-arm64.tar.xz
-            artifacts/Node-OBA-Fix-windows-x64.tar.gz
-            artifacts/Node-OBA-Fix-linux-armv7l.tar.xz
-            artifacts/update.zip            
+            Node-OBA-Fix-linux-x64.tar.xz
+            Node-OBA-Fix-linux-arm64.tar.xz
+            Node-OBA-Fix-macos-x64.tar.xz
+            Node-OBA-Fix-macos-arm64.tar.xz
+            Node-OBA-Fix-windows-x64.tar.gz
+            Node-OBA-Fix-linux-armv7l.tar.xz
+            update.zip            
