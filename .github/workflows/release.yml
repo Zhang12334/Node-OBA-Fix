@@ -100,6 +100,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-tar-ball, build-update-zip]
     steps:
+      - uses: actions/checkout@v4  # 添加这行以检出代码
+        with:
+          fetch-depth: 0  # 获取完整的提交历史
+
       - name: "Download Artifacts"
         uses: actions/download-artifact@v4
         with:
