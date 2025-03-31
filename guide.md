@@ -40,13 +40,6 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | CLUSTER_NO_ENABLE          |  否  | false                  | 是否禁用节点上线（会正常走开启流程、同步，但不会请求上线，一般用于调试或同步文件，请勿在生产环境中使用）                                               |
 | STARTUP_LIMIT              |  否  | 90                     | 24h启动的最多次数(以请求上线次数为准, 超过后将定时刷新，等待24h内上线次数不超限时再启动，避免被主控封禁)                                              |
 | STARTUP_LIMIT_WAIT_TIMEOUT |  否  | 600                    | 上线次数超限时等待响应的超时时间, 单位为秒, 一般10分钟即可无需修改                                                                                 |
-| WEBHOOK_RECONNECT          |  否  | false                  | 是否启用节点重连时触发的 Webhook                                                                                                                 |
-| WEBHOOK_STARTUP            |  否  | false                  | 是否启用节点上线时触发的 Webhook                                                                                                                 |
-| WEBHOOK_SHUTDOWN           |  否  | false                  | 是否启用节点下线时触发的 Webhook                                                                                                                 |
-| WEBHOOK_ERROR              |  否  | false                  | 是否启用节点工作进程异常退出时触发的 Webhook                                                                                                      |
-| 对应webhook配置项_MESSAGE   |  否  | -                      | 自定义触发 Webhook 时发送的消息，如：WEBHOOK_ERROR_MESSAGE / WEBHOOK_SHUTDOWN_MESSAGE                                                            |
-| WEBHOOK_URL                |  否  | -                      | Webhook URL，如：WEBHOOK_URL=http://127.0.0.1:8080/webhook                                                                                     |
-| CLUSTER_NAME               |  否  | Cluster                | 自定义节点名称, 目前会在同步、webhook时应用: 同步文件显示为 [Sync-节点名称], webhook显示为 [Cluster] 节点已下线                                      |
 | SYNC_CONCURRENCY           |  否  | -                      | 同步文件时并发数量，默认从主控获取（注：此配置项主要为主控不下发20并发的情况提供保底，因此设置的上限值为20，设置超过20时默认取最高值20）                  |
 | NO_CONNECT                 |  否  | false                  | 禁用连接主控功能（也不会请求证书）（可配合CLUSTER_NO_ENABLE+自定义证书搭建针对单节点多线的多端负载均衡）                                              |
 | DISABLE_OPTI_LOG           |  否  | false                  | 显示未优化的日志（请求地址会显示?后的部分，如优化后/measure/1，优化前/measure/1?s=w4Yh2cnF6Ctmo4CwUxZve2jN1UU&e=m8u973ob）                          |
@@ -58,9 +51,32 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | ENABLE_AUTO_UPDATE         |  否  | false                  | 是否启用自动更新功能（默认为禁用，启用后程序会自动检查更新并下载更新文件，更新完成后程序会自动重启，需本地有>10版本的NPM环境）                            |
 | ALLOW_NO_SIGN              |  否  | false                  | 是否允许未签名的请求                                                                                                                             |
 
-备注：Webhook 的整体结构为 `[节点名称] 消息内容`，如：`[Cluster] 节点已下线`、`[Cluster] 节点已重连`
+## 通知配置项
 
-发送到 WEBHOOK_URL 设置的地址里, 结构为 { content: "发送的内容" }
+### 通知渠道及其对应地址配置
+
+| 环境变量                    | 必填                            | 默认值                | 支持的选项               | 说明                                                                                                                   |
+| NOTIFY_ENABLED             |  否                             | false                 | true / false            | 是否启用通知功能                                                                                                        |
+| NOTIFY_TYPE                |  是（如果NOTIFY_ENABLED为true）  | -                     | webhook / onebot        | 启用的通知类型                                                                                                          |
+| NOTIFY_WEBHOOK_URL         |  是（如果NOTIFY_TYPE为webhook）  | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 Webhook 时使用的 Webhook URL，如：NOTIFY_WEBHOOK_URL=http://127.0.0.1:8080/webhook                       |
+| NOTIFY_ONEBOT_HTTP_API     |  是（如果NOTIFY_TYPE为onebot）   | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 OneBot 时使用的 Onebot HTTP API 地址，如：NOTIFY_ONEBOT_HTTP_API=http://127.0.0.1:8080                   |
+| NOTIFY_ONEBOT_SECRET       |  否（如果配置了上报密钥则必填）    | -                     | 一个字符串               | Onebot 配置的 HTTP 上报密钥，如：NOTIFY_ONEBOT_SECRET=1234567890                                                        |
+| NOTIFY_ONEBOT_TYPE         |  是（如果NOTIFY_TYPE为onebot）   | -                     | group / private         | 发送消息的聊天类型, private 为私聊，group 为群聊                                                                          |
+| NOTIFY_ONEBOT_TARGET       |  是（如果NOTIFY_TYPE为onebot）   | -                     | 一串数字                 | 发送消息的接收目标，NOTIFY_ONEBOT_TYPE 配置为 private 时为私聊 QQ 号, 反之则为群号, 如：NOTIFY_ONEBOT_TARGET=1234567890     |
+
+### 通知消息内容
+
+| 环境变量                    | 必填 | 默认值                 | 支持的选项               | 说明                                                                                                                                        |
+| NOTIFY_RECONNECT           |  否  | false                  | true / false            | 是否启用节点重连时触发的通知                                                                                                                  |
+| NOTIFY_STARTUP             |  否  | false                  | true / false            | 是否启用节点上线时触发的通知                                                                                                                  |
+| NOTIFY_SHUTDOWN            |  否  | false                  | true / false            | 是否启用节点下线时触发的通知                                                                                                                  |
+| NOTIFY_ERROR               |  否  | false                  | true / false            | 是否启用节点工作进程异常退出时触发的通知                                                                                                       |
+| 对应配置项_MESSAGE          |  否  | -                      | -                       | 自定义触发通知时发送的消息，如：NOTIFY_ERROR_MESSAGE / NOTIFY_SHUTDOWN_MESSAGE                                                                |
+| CLUSTER_NAME               |  否  | Cluster                | 一个字符串               | 自定义节点名称, 目前会在同步、通知时应用: 同步文件显示为 [Sync-节点名称], 通知显示为 [Cluster] 节点已下线                                         |
+
+备注：消息推送的整体结构为 `[节点名称] 消息内容`，如：`[Cluster] 节点已下线`、`[Cluster] 节点已重连`
+
+对于 Webhook, 发送到 NOTIFY_WEBHOOK_URL 设置的地址里, 结构为 { content: "发送的内容" }
 
 在部分性能较低的设备上，程序内置的自动重启功能可能会导致重新连接时出现问题（例如卡死等）
 
