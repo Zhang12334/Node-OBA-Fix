@@ -54,7 +54,6 @@ jobs:
           tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos') || contains(matrix.os, 'self-hosted')
 
-
       ## Windows Copy NodeJS
       - run: |
           $SRC = (Get-Command node.exe).Path
@@ -90,13 +89,11 @@ jobs:
         run: |
           zip -r update.zip dist package.json
 
-      - name: "Upload files"
+      - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
         with:
           name: update
-          path: |
-            dist
-            package.json
+          path: update.zip
 
   upload-to-release:
     name: "Upload to Release"
@@ -107,10 +104,26 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+          pattern: '*.tar.xz,*.tar.gz,*.zip'
+          merge-multiple: true
 
-      - name: "Upload to Release"
+      - name: "Generate Changelog"
+        run: npx changelogithub-chinese
+
+      - name: "Create Release"
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            Pre-built binaries for all platforms:
+            - Linux x64
+            - Linux ARM64
+            - Linux ARMv7
+            - macOS x64
+            - macOS ARM64
+            - Windows x64
+            - Update package
           files: |
             artifacts/Node-OBA-Fix-linux-x64.tar.xz
             artifacts/Node-OBA-Fix-linux-arm64.tar.xz
@@ -118,4 +131,4 @@ jobs:
             artifacts/Node-OBA-Fix-macos-arm64.tar.xz
             artifacts/Node-OBA-Fix-windows-x64.tar.gz
             artifacts/Node-OBA-Fix-linux-armv7l.tar.xz
-            artifacts/update.zip            
+            artifacts/update.zip
