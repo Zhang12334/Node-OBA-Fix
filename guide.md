@@ -59,6 +59,7 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | NOTIFY_ENABLED             |  否                             | false                 | true / false            | 是否启用通知功能                                                                                                        |
 | NOTIFY_TYPE                |  是（如果NOTIFY_ENABLED为true）  | -                     | webhook / onebot        | 启用的通知类型                                                                                                          |
 | NOTIFY_WEBHOOK_URL         |  是（如果NOTIFY_TYPE为webhook）  | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 Webhook 时使用的 Webhook URL，如：NOTIFY_WEBHOOK_URL=http://127.0.0.1:8080/webhook                       |
+| NOTIFY_WEBHOOK_JSON_KEY    |  否                             | content               | 一个字符串               | Webhook 发送 JSON 的 key, 发送消息结构为 { NOTIFY_WEBHOOK_JSON_KEY: "发送的内容" }                                       |
 | NOTIFY_ONEBOT_HTTP_API     |  是（如果NOTIFY_TYPE为onebot）   | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 OneBot 时使用的 Onebot HTTP API 地址，如：NOTIFY_ONEBOT_HTTP_API=http://127.0.0.1:8080                   |
 | NOTIFY_ONEBOT_SECRET       |  否（如果配置了上报密钥则必填）    | -                     | 一个字符串               | Onebot 配置的 HTTP 上报密钥，如：NOTIFY_ONEBOT_SECRET=1234567890                                                        |
 | NOTIFY_ONEBOT_TYPE         |  是（如果NOTIFY_TYPE为onebot）   | -                     | group / private         | 发送消息的聊天类型, private 为私聊，group 为群聊                                                                          |
@@ -75,8 +76,6 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | CLUSTER_NAME               |  否  | Cluster                | 一个字符串               | 自定义节点名称, 目前会在同步、通知时应用: 同步文件显示为 [Sync-节点名称], 通知显示为 [Cluster] 节点已下线                                         |
 
 备注：消息推送的整体结构为 `[节点名称] 消息内容`，如：`[Cluster] 节点已下线`、`[Cluster] 节点已重连`
-
-对于 Webhook, 发送到 NOTIFY_WEBHOOK_URL 设置的地址里, 结构为 { content: "发送的内容" }
 
 在部分性能较低的设备上，程序内置的自动重启功能可能会导致重新连接时出现问题（例如卡死等）
 

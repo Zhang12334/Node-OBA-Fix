@@ -65,6 +65,7 @@ export class Config {
   public readonly notifyEnabled = env.get('NOTIFY_ENABLED').asBool();
   public readonly notifyType = env.get('NOTIFY_TYPE').asString();
   public readonly notifyWebhookUrl = env.get('NOTIFY_WEBHOOK_URL').asString();
+  public readonly notifyWebhookJsonKey = env.get('NOTIFY_WEBHOOK_JSON_KEY').asString();
   public readonly notifyOnebotHttpApi = env.get('NOTIFY_ONEBOT_HTTP_API').asString();
   public readonly notifyOnebotSecret = env.get('NOTIFY_ONEBOT_SECRET').asString();
   public readonly notifyOnebotType = env.get('NOTIFY_ONEBOT_TYPE').asString();
