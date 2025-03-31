@@ -64,6 +64,7 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | NOTIFY_ONEBOT_SECRET       |  否（如果配置了上报密钥则必填）    | -                     | 一个字符串               | Onebot 配置的 HTTP 上报密钥，如：NOTIFY_ONEBOT_SECRET=1234567890                                                        |
 | NOTIFY_ONEBOT_TYPE         |  是（如果NOTIFY_TYPE为onebot）   | -                     | group / private         | 发送消息的聊天类型, private 为私聊，group 为群聊                                                                          |
 | NOTIFY_ONEBOT_TARGET       |  是（如果NOTIFY_TYPE为onebot）   | -                     | 一串数字                 | 发送消息的接收目标，NOTIFY_ONEBOT_TYPE 配置为 private 时为私聊 QQ 号, 反之则为群号, 如：NOTIFY_ONEBOT_TARGET=1234567890     |
+| NOTIFY_DEBUG_MODE          |  否                             | false                 | true / false            | 是否启用通知调试模式（很吵，为了debug会通知一些日志，不建议开）                                                              |
 
 ### 通知消息内容
 

@@ -12,6 +12,7 @@ import { TokenManager } from './token.js';
 import { IFileList } from './types.js';
 import got from 'got';
 import fs from 'fs-extra';
+import { notify } from './notify.js';
 
 const davStorageUrl = process.env.CLUSTER_STORAGE_OPTIONS ? JSON.parse(process.env.CLUSTER_STORAGE_OPTIONS) : {};
 const davBaseUrl = `${davStorageUrl.url}/${davStorageUrl.basePath}`;
@@ -86,7 +87,13 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   logger.info(colors.green(`当前版本: ${version}`));
   logger.info(colors.green(`协议版本: ${protocol_version}`));
   logger.debug(colors.yellow(`已开启debug日志`));
-  logger.debug(colors.yellow(`已开启Webhook功能`));
+
+  if (config.notifyEnabled) {
+    logger.debug(colors.yellow(`已开启通知功能`));
+  }
+  if (config.notifyDebugMode) {
+    notify.send(`Booting Node-OBA-Fix ${version}`)
+  }
 
   const startupFilePath = join('data', 'startup.json');
 
@@ -251,6 +258,9 @@ export async function bootstrap(version: string, protocol_version: string): Prom
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');    
+    if(config.notifyDebugMode){
+      notify.send(`节点上线功能已禁用`)
+    }          
 
     // 在禁用节点上线时也支持同步文件
     if (!config.disableSyncFiles) {

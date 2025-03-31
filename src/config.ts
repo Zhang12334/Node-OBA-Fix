@@ -70,6 +70,7 @@ export class Config {
   public readonly notifyOnebotSecret = env.get('NOTIFY_ONEBOT_SECRET').asString();
   public readonly notifyOnebotType = env.get('NOTIFY_ONEBOT_TYPE').asString();
   public readonly notifyOnebotTarget = env.get('NOTIFY_ONEBOT_TARGET').asString();
+  public readonly notifyDebugMode = env.get('NOTIFY_DEBUG_MODE').asBool();
 
   // 通知消息内容
   public readonly notifyReconnect = env.get('NOTIFY_RECONNECT').asBool();
