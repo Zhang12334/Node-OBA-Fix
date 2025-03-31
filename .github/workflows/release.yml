@@ -3,7 +3,7 @@ name: "Release Binary"
 on:
   push:
     tags:
-      - 'v*.*.*'  # 仅当推送的标签以 'v' 开头时触发（例如 v1.0.0）
+      - 'v*.*.*'  # 推送标签时触发
 
 jobs:
   build-full-install-zip:
