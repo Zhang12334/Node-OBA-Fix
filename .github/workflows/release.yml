@@ -107,12 +107,13 @@ jobs:
         with:
           fetch-depth: 0  # 获取完整git历史记录
 
+      - name: "Ensure Artifacts Directory Exists"
+        run: mkdir -p artifacts
+
       - name: "Download Artifacts"
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          pattern: '*.tar.xz,*.tar.gz,*.zip'
-          merge-multiple: true
 
       # 调试：列出下载的文件
       - name: "List Downloaded Artifacts"
