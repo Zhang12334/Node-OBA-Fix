@@ -52,6 +52,9 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | DISABLE_OPTI_LOG           |  否  | false                  | 显示未优化的日志（请求地址会显示?后的部分，如优化后/measure/1，优化前/measure/1?s=w4Yh2cnF6Ctmo4CwUxZve2jN1UU&e=m8u973ob）                          |
 | DISABLE_NEW_SYNC_STATUS    |  否  | false                  | 禁用新的同步状态显示，会显示单个文件的下载进度显示并更改为原版的排版                                                                                 |
 | DISABLE_SYNC_FILES         |  否  | false                  | 禁用同步文件功能（警告：此功能为多端单节点设计，请勿在任何单端单存储的节点上使用，将会导致节点出现缺少大量文件的情况，并扣光信任值然后被ban）              |
+| DISABLE_FIRST_SYNC_FILES   |  否  | false                  | 禁用启动时的同步文件功能（警告：此功能为测试性功能，请勿在任何生产环境节点上使用，将会导致节点出现缺少大量文件的情况，并扣光信任值然后被ban）              |
+| SYNC_INTERVAL              |  否  | 10m                    | 每次同步文件的间隔时间，如 10m 为 10 分钟, 1h 为 1 小时, 20s 为 20 秒                                                                              |
+| ALWAYS_CHECK_MISSING_FILES |  否  | false                  | 是否总是检查缺失的文件（默认为禁用，启用后每次同步文件都会检查缺失的文件而不是只对比云端文件列表是否有更新）                                             |
 | ENABLE_AUTO_UPDATE         |  否  | false                  | 是否启用自动更新功能（默认为禁用，启用后程序会自动检查更新并下载更新文件，更新完成后程序会自动重启，需本地有>10版本的NPM环境）                            |
 | ALLOW_NO_SIGN              |  否  | false                  | 是否允许未签名的请求                                                                                                                             |
 
