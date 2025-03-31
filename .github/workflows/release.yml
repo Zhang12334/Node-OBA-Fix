@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 permissions:
-  contents: write
+  contents: write  # 必须有这个权限才能创建release
 
 jobs:
   build-tar-ball:
@@ -105,7 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # 获取完整git历史记录
 
       - name: "Download Artifacts"
         uses: actions/download-artifact@v4
@@ -114,13 +114,15 @@ jobs:
           pattern: '*.tar.xz,*.tar.gz,*.zip'
           merge-multiple: true
 
+      # 调试：列出下载的文件
+      - name: "List Downloaded Artifacts"
+        run: ls -R artifacts
+
       - name: "Generate Changelog"
         run: npx changelogithub-chinese
 
       - name: "Create Release"
         uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
@@ -141,3 +143,4 @@ jobs:
             artifacts/Node-OBA-Fix-windows-x64.tar.gz
             artifacts/Node-OBA-Fix-linux-armv7l.tar.xz
             artifacts/update.zip
+          token: ${{ secrets.GITHUB_TOKEN }}  # 显式传递 GITHUB_TOKEN
