@@ -40,20 +40,29 @@ jobs:
       - run: npm i --no-package-lock
       - run: npm run build
 
-      ## Linux & MacOS
+      ## Linux & MacOS Copy NodeJS
       - run: |
           cp $(which node) .
           cp platforms/linux/run.sh .
+        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos') || contains(matrix.os, 'self-hosted')
+
+      ## Linux & MacOS Tar
+      - run: |
           tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos') || contains(matrix.os, 'self-hosted')
 
-      ## Windows
+
+      ## Windows Copy NodeJS
       - run: |
           $SRC = (Get-Command node.exe).Path
           copy $SRC node.exe
           copy platforms/windows/run.ps1 .
-          tar -caf ${{ matrix.artifact_name }} dist package.json node_modules node.exe run.ps1
         if: matrix.os == 'windows-latest'
+
+      ## Windows Tar
+      - run: |
+          tar -caf ${{ matrix.artifact_name }} dist package.json node_modules node.exe run.ps1
+        if: matrix.os == 'windows-latest'        
 
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
