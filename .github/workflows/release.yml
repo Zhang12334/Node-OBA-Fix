@@ -6,60 +6,7 @@ on:
       - 'v*.*.*'  # 仅当推送的标签以 'v' 开头时触发（例如 v1.0.0）
 
 jobs:
-  build-tar-ball:
-    name: "Build and Tar Ball"
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-       
 
-          - os: windows-latest
-            artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"
-                 
-         
-
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - run: npm i --no-package-lock
-      - run: npm run build
-
-      ## Linux & MacOS Copy NodeJS
-      - run: |
-          cp $(which node) .
-          cp platforms/linux/run.sh .
-        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos') || contains(matrix.os, 'self-hosted')
-
-      ## Linux & MacOS Tar
-      - run: |
-          tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
-        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos') || contains(matrix.os, 'self-hosted')
-
-
-      ## Windows Copy NodeJS
-      - run: |
-          $SRC = (Get-Command node.exe).Path
-          copy $SRC node.exe
-          copy platforms/windows/run.ps1 .
-        if: matrix.os == 'windows-latest'
-
-      ## Windows Tar
-      - run: |
-          tar -caf ${{ matrix.artifact_name }} dist package.json node_modules node.exe run.ps1
-        if: matrix.os == 'windows-latest'        
-
-      - name: "Upload Artifact"
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_name }}
 
   build-update-zip:
     name: "Build Update Zip"
@@ -89,22 +36,17 @@ jobs:
   upload-to-release:
     name: "Upload to Release"
     runs-on: ubuntu-latest
-    needs: [build-tar-ball, build-update-zip]
+    needs: [build-update-zip]
     steps:
       - name: "Download Artifacts"
         uses: actions/download-artifact@v4
 
-      - name: "Check Files"
-        run: ls -l
-      
+      - name: "test"
+        run: |
+          tree -P "*.zip"
+
       - name: "Upload to Release"
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            Node-OBA-Fix-linux-x64.tar.xz
-            Node-OBA-Fix-linux-arm64.tar.xz
-            Node-OBA-Fix-macos-x64.tar.xz
-            Node-OBA-Fix-macos-arm64.tar.xz
-            Node-OBA-Fix-windows-x64.tar.gz
-            Node-OBA-Fix-linux-armv7l.tar.xz
             update.zip            
