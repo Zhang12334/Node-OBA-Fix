@@ -29,7 +29,7 @@ jobs:
 
           - os: windows-latest
             artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"
-                 
+                  
           # 自托管 runner, 构建 Onecloud ArmV7L 镜像
           #- os: self-hosted
           #  artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
@@ -45,6 +45,9 @@ jobs:
 
       - run: npm i --no-package-lock
       - run: npm run build
+
+      ## Debugging: List content of the current directory
+      - run: ls -la
 
       ## Linux & MacOS Copy NodeJS
       - run: |
@@ -118,6 +121,12 @@ jobs:
       # 调试：列出下载的文件
       - name: "List Downloaded Artifacts"
         run: ls -R artifacts
+
+      - run: npm install changelogithub-chinese  # 安装 changelogithub-chinese 包
+
+      # 增加调试步骤：列出当前目录下的文件
+      - name: "List Current Directory"
+        run: ls -la
 
       - name: "Generate Changelog"
         run: npx changelogithub-chinese
