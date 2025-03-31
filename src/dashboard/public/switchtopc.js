@@ -2,7 +2,7 @@
 var isChecked = false;
 // 检测移动端或小屏幕并显示提示
 function checkMobile() {
-	// 同意一次不再提示
+	// 同意一次即不再提示
 	if(!isChecked){
 		// 设备类型检测
 		const isMobile = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
