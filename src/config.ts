@@ -34,8 +34,6 @@ export class Config {
   public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
   public readonly noConnect = env.get('NO_CONNECT').asBool()  
 
-  public readonly clusterName = env.get('CLUSTER_NAME').asString()
-
   // SSL
   public readonly sslKey = env.get('SSL_KEY').asString()
   public readonly sslCert = env.get('SSL_CERT').asString()
@@ -63,18 +61,25 @@ export class Config {
   public readonly disableOptiLog = env.get('DISABLE_OPTI_LOG').asBool()
   public readonly disableNewSyncStatus = env.get('DISABLE_NEW_SYNC_STATUS').asBool()
 
-  // webhook 配置项
-  public readonly enableWebhookReconnect = env.get('WEBHOOK_RECONNECT').asBool()
-  public readonly enableWebhookStartUP = env.get('WEBHOOK_STARTUP').asBool()
-  public readonly enableWebhookShutdown = env.get('WEBHOOK_SHUTDOWN').asBool()
-  public readonly enableWebhookError = env.get('WEBHOOK_ERROR').asBool()
+  // 通知配置项
+  public readonly notifyEnabled = env.get('NOTIFY_ENABLED').asBool();
+  public readonly notifyType = env.get('NOTIFY_TYPE').asString();
+  public readonly notifyWebhookUrl = env.get('NOTIFY_WEBHOOK_URL').asString();
+  public readonly notifyOnebotHttpApi = env.get('NOTIFY_ONEBOT_HTTP_API').asString();
+  public readonly notifyOnebotSecret = env.get('NOTIFY_ONEBOT_SECRET').asString();
+  public readonly notifyOnebotType = env.get('NOTIFY_ONEBOT_TYPE').asString();
+  public readonly notifyOnebotTarget = env.get('NOTIFY_ONEBOT_TARGET').asString();
 
-  public readonly WebhookReconnectMessage = env.get('WEBHOOK_RECONNECT_MESSAGE').asString()
-  public readonly WebhookStartUPMessage = env.get('WEBHOOK_STARTUP_MESSAGE').asString()
-  public readonly WebhookShutdownMessage = env.get('WEBHOOK_SHUTDOWN_MESSAGE').asString()
-  public readonly WebhookErrorMessage = env.get('WEBHOOK_ERROR_MESSAGE').asString()
-
-  public readonly webhookUrl = env.get('WEBHOOK_URL').asString()
+  // 通知消息内容
+  public readonly notifyReconnect = env.get('NOTIFY_RECONNECT').asBool();
+  public readonly notifyReconnectMessage = env.get('NOTIFY_RECONNECT_MESSAGE').asString();
+  public readonly notifyStartup = env.get('NOTIFY_STARTUP').asBool();
+  public readonly notifyStartupMessage = env.get('NOTIFY_STARTUP_MESSAGE').asString();
+  public readonly notifyShutdown = env.get('NOTIFY_SHUTDOWN').asBool();
+  public readonly notifyShutdownMessage = env.get('NOTIFY_SHUTDOWN_MESSAGE').asString();
+  public readonly notifyError = env.get('NOTIFY_ERROR').asBool();
+  public readonly notifyErrorMessage = env.get('NOTIFY_ERROR_MESSAGE').asString();
+  public readonly clusterName = env.get('CLUSTER_NAME').asString()
 
   private constructor() {
     this.flavor = {
