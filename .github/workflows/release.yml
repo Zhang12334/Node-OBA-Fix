@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'  # 仅当推送的标签以 'v' 开头时触发（例如 v1.0.0）
 
 jobs:
-  build-tar-ball:
+  build-full-install-zip:
     name: "构建 - 全量安装包"
     strategy:
       fail-fast: false
@@ -116,7 +116,7 @@ jobs:
   upload-to-release:
     name: "打包 - 上传至 Release"
     runs-on: ubuntu-latest
-    needs: [build-tar-ball, build-update-zip]
+    needs: [build-full-install-zip, build-update-zip]
     steps:
       - name: "获取源代码"
         uses: actions/checkout@v4
