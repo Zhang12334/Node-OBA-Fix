@@ -174,6 +174,7 @@ export class Cluster {
   }
 
   public async getFileList(lastModified?: number): Promise<IFileList> {
+    sync_logger.info('正在尝试获取云端文件列表');
     const res = await this.got.get('openbmclapi/files', {
       responseType: 'buffer',
       cache: this.requestCache,
@@ -208,13 +209,11 @@ export class Cluster {
     sync_logger.info('正在检查缺失文件')
     const missingFiles = await this.storage.getMissingFiles(fileList.files)
     if (missingFiles.length === 0) {
+      sync_logger.info(`没有新文件`)
       return
     } else {
       sync_logger.info(`缺少 ${missingFiles.length} 个文件, 正在开始同步`)
     }
-    
-    // 看着太割裂了，而且没啥大用，扔debug里
-    logger.debug(syncConfig, '同步策略')
     
     const parallel =
       config.syncConcurrency === undefined || config.syncConcurrency < 1
@@ -222,7 +221,8 @@ export class Cluster {
           : config.syncConcurrency > 20
           ? 20
           : config.syncConcurrency;
-
+    
+    sync_logger.info(`同步源: ${syncConfig.source}`)
     sync_logger.info(`同步并发数: ${parallel}`)
     sync_logger.info(`节点信息: ${config.clusterName || 'Cluster'}`)
 

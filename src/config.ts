@@ -55,6 +55,9 @@ export class Config {
   // 同步设置项
   public readonly syncConcurrency = env.get('SYNC_CONCURRENCY').default(10).asInt()
   public readonly disableSyncFiles = env.get('DISABLE_SYNC_FILES').asBool()
+  public readonly disableFirstSyncFiles = env.get('DISABLE_FIRST_SYNC_FILES').asBool()
+  public readonly SyncInterval = env.get('SYNC_INTERVAL').asString()
+  public readonly AlwaysCheckMissingFiles = env.get('ALWAYS_CHECK_MISSING_FILES').asBool()
 
   // 视觉配置项
   public readonly disableOptiLog = env.get('DISABLE_OPTI_LOG').asBool()
