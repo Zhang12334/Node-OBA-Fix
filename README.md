@@ -10,6 +10,6 @@
 
 支持的平台: Windows | MacOS | Linux
 
-[使用教程](guide.md) | [发行版列表](https://github.com/Zhang12334/Node-OBA-Fix/releases) | [Issues页面](https://github.com/Zhang12334/Node-OBA-Fix/issues)
+[发行版列表](https://github.com/Zhang12334/Node-OBA-Fix/releases) | [📖使用教程📖](guide.md) | [Issues页面](https://github.com/Zhang12334/Node-OBA-Fix/issues)
   
 </div>
