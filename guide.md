@@ -38,10 +38,10 @@ OpenBMCLAPI 是一个高效、灵活的 Minecraft 资源分发系统，旨在为
 | ENABLE_EXIT_DELAY          |  否  | false                  | 使用自定义固定秒数而非内置退避策略的重启前等待时间                                                                                                |
 | EXIT_DELAY                 |  否  | 3                      | 在重启/退出前进行自定义秒数的延迟                                                                                                                |
 | CLUSTER_NO_ENABLE          |  否  | false                  | 是否禁用节点上线（会正常走开启流程、同步，但不会请求上线，一般用于调试或同步文件，请勿在生产环境中使用）                                               |
+| NO_CONNECT                 |  否  | false                  | 禁用连接主控功能（也不会请求证书）（可配合自定义证书搭建针对单节点多线的多端负载均衡, 此功能开启时CLUSTER_NO_ENABLE将会强制设置为true）                 |
 | STARTUP_LIMIT              |  否  | 90                     | 24h启动的最多次数(以请求上线次数为准, 超过后将定时刷新，等待24h内上线次数不超限时再启动，避免被主控封禁)                                              |
 | STARTUP_LIMIT_WAIT_TIMEOUT |  否  | 600                    | 上线次数超限时等待响应的超时时间, 单位为秒, 一般10分钟即可无需修改                                                                                 |
 | SYNC_CONCURRENCY           |  否  | -                      | 同步文件时并发数量，默认从主控获取（注：此配置项主要为主控不下发20并发的情况提供保底，因此设置的上限值为20，设置超过20时默认取最高值20）                  |
-| NO_CONNECT                 |  否  | false                  | 禁用连接主控功能（也不会请求证书）（可配合CLUSTER_NO_ENABLE+自定义证书搭建针对单节点多线的多端负载均衡）                                              |
 | DISABLE_OPTI_LOG           |  否  | false                  | 显示未优化的日志（请求地址会显示?后的部分，如优化后/measure/1，优化前/measure/1?s=w4Yh2cnF6Ctmo4CwUxZve2jN1UU&e=m8u973ob）                          |
 | DISABLE_NEW_SYNC_STATUS    |  否  | false                  | 禁用新的同步状态显示，会显示单个文件的下载进度显示并更改为原版的排版                                                                                 |
 | DISABLE_SYNC_FILES         |  否  | false                  | 禁用同步文件功能（警告：此功能为多端单节点设计，请勿在任何单端单存储的节点上使用，将会导致节点出现缺少大量文件的情况，并扣光信任值然后被ban）              |

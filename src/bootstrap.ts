@@ -245,7 +245,7 @@ export async function bootstrap(version: string, protocol_version: string): Prom
 
   let checkFileInterval: NodeJS.Timeout;
 
-  if (config.noENABLE) {
+  if (config.noENABLE || config.noConnect) {
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
