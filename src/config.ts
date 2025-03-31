@@ -16,7 +16,9 @@ const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.js
 export class Config {
   public static instance: Config
 
-  // 节点本体相关
+  // -------------原版-------------
+
+  // 综合配置项
   public readonly clusterId = env.get('CLUSTER_ID').required().asString()
   public readonly clusterSecret = env.get('CLUSTER_SECRET').required().asString()
   public readonly clusterIp? = env.get('CLUSTER_IP').asString()
@@ -36,14 +38,28 @@ export class Config {
   public readonly flavor: IConfigFlavor
 
   // 调试配置项
-  public readonly allowNoSign = env.get('CLUSTER_ALLOW_NO_SIGN').asBool()
-  public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
-  public readonly noConnect = env.get('CLUSTER_NO_CONNECT').asBool() 
   public readonly nodeENV = env.get('NODE_ENV').asString()   
   public readonly noDaemon = env.get('NO_DAEMON').asBool()
   public readonly disableAccessLog = env.get('DISABLE_ACCESS_LOG').asBool()  
   public readonly ClusterBMCLAPI = env.get('CLUSTER_BMCLAPI').asString()
   public readonly noFastEnable = env.get('NO_FAST_ENABLE').asBool()
+
+
+  // -------------新增-------------
+  
+  // 综合配置项
+  public readonly StartUPLimit = env.get('STARTUP_LIMIT').asInt()
+  public readonly StartUPLimitWaitTimeout = env.get('STARTUP_LIMIT_WAIT_TIMEOUT').asInt()
+  public readonly disableOptiLog = env.get('DISABLE_OPTI_LOG').asBool() // 禁用新LOG
+  public readonly enableAutoUpdate = env.get('ENABLE_AUTO_UPDATE').asBool() // 自动更新
+  public readonly restartProcess = env.get('RESTART_PROCESS').asBool()  
+  public readonly enableExitDelay = env.get('ENABLE_EXIT_DELAY').asBool()
+  public readonly exitDelay = env.get('EXIT_DELAY').asInt()
+
+  // 调试配置项
+  public readonly allowNoSign = env.get('CLUSTER_ALLOW_NO_SIGN').asBool()
+  public readonly noENABLE = env.get('CLUSTER_NO_ENABLE').asBool()
+  public readonly noConnect = env.get('CLUSTER_NO_CONNECT').asBool() 
   
   // 版本
   public readonly protocol_version = packageJson.protocol_version
@@ -56,15 +72,6 @@ export class Config {
   public readonly SyncInterval = env.get('SYNC_INTERVAL').asString()
   public readonly AlwaysCheckMissingFiles = env.get('SYNC_ALWAYS_CHECK_MISSING_FILES').asBool()
   public readonly disableNewSyncStatus = env.get('SYNC_DISABLE_NEW_SYNC_STATUS').asBool()  
-
-  // 综合配置项
-  public readonly StartUPLimit = env.get('STARTUP_LIMIT').asInt()
-  public readonly StartUPLimitWaitTimeout = env.get('STARTUP_LIMIT_WAIT_TIMEOUT').asInt()
-  public readonly disableOptiLog = env.get('DISABLE_OPTI_LOG').asBool() // 禁用新LOG
-  public readonly enableAutoUpdate = env.get('ENABLE_AUTO_UPDATE').asBool() // 自动更新
-  public readonly restartProcess = env.get('RESTART_PROCESS').asBool()  
-  public readonly enableExitDelay = env.get('ENABLE_EXIT_DELAY').asBool()
-  public readonly exitDelay = env.get('EXIT_DELAY').asInt()
 
   // 通知配置项
   public readonly notifyEnabled = env.get('NOTIFY_ENABLED').asBool();
