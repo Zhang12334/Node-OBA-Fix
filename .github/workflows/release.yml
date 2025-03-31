@@ -7,7 +7,6 @@ on:
 
 jobs:
 
-
   build-update-zip:
     name: "打包升级压缩包"
     runs-on: ubuntu-latest
@@ -18,8 +17,13 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - run: npm i --no-package-lock
-      - run: npm run build
+      - name: "安装依赖"
+        run: |
+          npm i --no-package-lock
+
+      - name: "开始构建"
+        run: |
+          npm run build
 
       - name: "打包 update.zip"
         run: |
@@ -43,43 +47,8 @@ jobs:
 
       - name: "重新打包为ZIP文件"
         run: |
-          # Unpack and repack Node-OBA-Fix-linux-x64.tar.xz
-          tar -xf Node-OBA-Fix-linux-x64.tar.xz
-          cd Node-OBA-Fix-linux-x64
-          zip -r ../Node-OBA-Fix-linux-x64.zip *
-          cd ..
 
-          # Unpack and repack Node-OBA-Fix-linux-arm64.tar.xz
-          tar -xf Node-OBA-Fix-linux-arm64.tar.xz
-          cd Node-OBA-Fix-linux-arm64
-          zip -r ../Node-OBA-Fix-linux-arm64.zip *
-          cd ..
-
-          # Unpack and repack Node-OBA-Fix-macos-x64.tar.xz
-          tar -xf Node-OBA-Fix-macos-x64.tar.xz
-          cd Node-OBA-Fix-macos-x64
-          zip -r ../Node-OBA-Fix-macos-x64.zip *
-          cd ..
-
-          # Unpack and repack Node-OBA-Fix-macos-arm64.tar.xz
-          tar -xf Node-OBA-Fix-macos-arm64.tar.xz
-          cd Node-OBA-Fix-macos-arm64
-          zip -r ../Node-OBA-Fix-macos-arm64.zip *
-          cd ..
-
-          # Unpack and repack Node-OBA-Fix-windows-x64.tar.gz
-          tar -xzf Node-OBA-Fix-windows-x64.tar.gz
-          cd Node-OBA-Fix-windows-x64
-          zip -r ../Node-OBA-Fix-windows-x64.zip *
-          cd ..
-
-          # Unpack and repack Node-OBA-Fix-linux-armv7l.tar.xz
-          tar -xf Node-OBA-Fix-linux-armv7l.tar.xz
-          cd Node-OBA-Fix-linux-armv7l
-          zip -r ../Node-OBA-Fix-linux-armv7l.zip *
-          cd ..
-
-          # Repack update folder
+          # 重新打包 update
           cd update
           zip -r ../update.zip *
           cd ..
@@ -88,10 +57,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            Node-OBA-Fix-linux-x64.zip
-            Node-OBA-Fix-linux-arm64.zip
-            Node-OBA-Fix-macos-x64.zip
-            Node-OBA-Fix-macos-arm64.zip
-            Node-OBA-Fix-windows-x64.zip
-            Node-OBA-Fix-linux-armv7l.zip
+            Node-OBA-Fix-linux-x64.tar.xz.zip
+            Node-OBA-Fix-linux-arm64.tar.xz.zip
+            Node-OBA-Fix-macos-x64.tar.xz.zip
+            Node-OBA-Fix-macos-arm64.tar.xz.zip
+            Node-OBA-Fix-windows-x64.tar.xz.zip
+            Node-OBA-Fix-linux-armv7l.tar.xz.zip
             update.zip
