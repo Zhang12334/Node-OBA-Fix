@@ -19,6 +19,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const storageType = process.env.CLUSTER_STORAGE || 'file'; // 检查存储类型
 const startuplimit = parseInt(process.env.STARTUP_LIMIT || '90', 10);
 const STARTUP_LIMIT_WAIT_TIMEOUT = parseInt(process.env.STARTUP_LIMIT_WAIT_TIMEOUT || '600', 10);
+const syncInterval = config.SyncInterval || '10m';
 
 // 检查上线次数是否超过限制
 function isExceedLimit(startupTimes: number[], limit: number): boolean {
@@ -221,9 +222,14 @@ export async function bootstrap(version: string, protocol_version: string): Prom
 
   const configuration = await cluster.getConfiguration();
   const files = await cluster.getFileList();
-  sync_logger.info(`${files.files.length} files`);
+  sync_logger.info(`云端文件数量: ${files.files.length} files`);
 
-  if (!config.disableSyncFiles) {
+  if (config.disableSyncFiles) {
+    // 先检查是否禁用文件同步
+    logger.warn('已禁用文件同步');
+  } else if(config.disableFirstSyncFiles) {
+    logger.warn('已禁用初始文件同步');
+  } else {
     // 如果没有禁用同步文件
     try {
       await cluster.syncFiles(files, configuration.sync);
@@ -235,9 +241,8 @@ export async function bootstrap(version: string, protocol_version: string): Prom
     }
     sync_logger.info('回收文件');
     cluster.gcBackground(files);
-  } else {
-    logger.warn('已禁用文件同步');
   }
+
   let checkFileInterval: NodeJS.Timeout;
 
   if (config.noENABLE) {
@@ -246,6 +251,20 @@ export async function bootstrap(version: string, protocol_version: string): Prom
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');    
+
+    // 在禁用节点上线时也支持同步文件
+    if (!config.disableSyncFiles) {
+      // 如果没有禁用同步文件
+      checkFileInterval = setTimeout(() => {
+        void checkFile(files).catch((e) => {
+          logger.error(e, '文件检查失败');
+        });
+        // 每隔一段时间开始同步
+      }, ms(syncInterval));
+    } else {
+      logger.warn('已禁用文件同步');
+    }
+
   } else {
     try {
       logger.info('请求上线');
@@ -255,11 +274,13 @@ export async function bootstrap(version: string, protocol_version: string): Prom
         process.send('ready');
       }
       if (!config.disableSyncFiles) {
+        // 如果没有禁用同步文件
         checkFileInterval = setTimeout(() => {
           void checkFile(files).catch((e) => {
             logger.error(e, '文件检查失败');
           });
-        }, ms('10m'));
+          // 每隔一段时间开始同步
+        }, ms(syncInterval));
       } else {
         logger.warn('已禁用文件同步');
       }
@@ -274,14 +295,15 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   }
 
   async function checkFile(lastFileList: IFileList): Promise<void> {
-    sync_logger.debug('刷新文件中');
     try {
       const lastModified = max(lastFileList.files.map((file) => file.mtime));
       const fileList = await cluster.getFileList(lastModified);
-      if (fileList.files.length === 0) {
+
+      if (!config.AlwaysCheckMissingFiles && fileList.files.length === 0) {
         sync_logger.debug('没有新文件');
         return;
       }
+
       const configuration = await cluster.getConfiguration();
       await cluster.syncFiles(files, configuration.sync);
       lastFileList = fileList;
@@ -290,7 +312,8 @@ export async function bootstrap(version: string, protocol_version: string): Prom
         checkFile(lastFileList).catch((e) => {
           sync_logger.error(e, '文件检查失败');
         });
-      }, ms('10m'));
+        // 每隔一段时间开始同步
+      }, ms(syncInterval));
     }
   }
 
