@@ -89,7 +89,7 @@ const dataPath = path.resolve(Config.config.dataPath);
 	if(!existsSync(dataPath)){
 		mkdirSync(dataPath, { recursive: true });
 	}
-	const statsFilePath = path.join(dataPath, `./stats_${process.env.CLUSTER_ID || 'default'}.json`);
+	const statsFilePath = path.join(dataPath, `./stats_${config.clusterId || 'default'}.json`);
 
 	// 读取统计数据
 	const readStatsFile = async () => {

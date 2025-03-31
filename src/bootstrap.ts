@@ -14,12 +14,12 @@ import got from 'got';
 import fs from 'fs-extra';
 import { notify } from './notify.js';
 
-const davStorageUrl = process.env.CLUSTER_STORAGE_OPTIONS ? JSON.parse(process.env.CLUSTER_STORAGE_OPTIONS) : {};
+const davStorageUrl = config.storageOpts ? JSON.parse(JSON.stringify(config.storageOpts)) : {};
 const davBaseUrl = `${davStorageUrl.url}/${davStorageUrl.basePath}`;
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const storageType = process.env.CLUSTER_STORAGE || 'file'; // 检查存储类型
-const startuplimit = parseInt(process.env.STARTUP_LIMIT || '90', 10);
-const STARTUP_LIMIT_WAIT_TIMEOUT = parseInt(process.env.STARTUP_LIMIT_WAIT_TIMEOUT || '600', 10);
+const storageType = config.storage || 'file'; // 检查存储类型
+const startuplimit = config.StartUPLimit || 90;
+const STARTUP_LIMIT_WAIT_TIMEOUT = config.StartUPLimitWaitTimeout || 600;
 const syncInterval = config.SyncInterval || '10m';
 
 // 检查上线次数是否超过限制
@@ -296,7 +296,7 @@ export async function bootstrap(version: string, protocol_version: string): Prom
       }
     } catch (e) {
       logger.fatal(e);
-      if (process.env.NODE_ENV === 'development') {
+      if (config.nodeENV === 'development') {
         logger.fatal('调试模式已开启, 不进行退出');
       } else {
         cluster.exit(1);

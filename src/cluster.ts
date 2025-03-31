@@ -85,7 +85,7 @@ export class Cluster {
   public nginxProcess?: ChildProcess
   public readonly storage: IStorage
 
-  private readonly prefixUrl = process.env.CLUSTER_BMCLAPI ?? 'https://openbmclapi.bangbang93.com'
+  private readonly prefixUrl = config.ClusterBMCLAPI ?? 'https://openbmclapi.bangbang93.com'
   private host?: string
   private _port: number | string
   private readonly publicPort: number
@@ -653,7 +653,7 @@ export class Cluster {
       port: this.publicPort,
       version: this.protocol_version,
       byoc: config.byoc,
-      noFastEnable: process.env.NO_FAST_ENABLE === 'true',
+      noFastEnable: config.noFastEnable === true,
       flavor: config.flavor,
     })
   }
@@ -811,7 +811,7 @@ export class Cluster {
         port: this.publicPort,
         version: this.protocol_version,
         byoc: config.byoc,
-        noFastEnable: process.env.NO_FAST_ENABLE === 'true',
+        noFastEnable: config.noFastEnable === true,
         flavor: config.flavor,
       })) as unknown
       if (Array.isArray(res)) {

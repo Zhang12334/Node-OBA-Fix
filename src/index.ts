@@ -23,7 +23,7 @@ const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.js
 dotenvConfig()
 
 // 如果以非守护进程模式运行，直接启动应用
-if (process.env.NO_DAEMON || !cluster.isPrimary) {
+if (config.noDaemon || !cluster.isPrimary) {
   bootstrap(packageJson.version, packageJson.protocol_version).catch((err) => {
     // eslint-disable-next-line no-console
     console.error(err)
@@ -33,7 +33,7 @@ if (process.env.NO_DAEMON || !cluster.isPrimary) {
 }
 
 // 如果以守护进程模式运行，创建子进程
-if (!process.env.NO_DAEMON && cluster.isPrimary) {
+if (!config.noDaemon && cluster.isPrimary) {
   checkUpdate().then(() => {
     forkWorker();
   });
@@ -225,9 +225,9 @@ function forkWorker(): void {
 
   // 监听退出
   worker.on('exit', (code, signal) => {
-    if (process.env.RESTART_PROCESS === 'false') {
+    if (config.restartProcess === false) {
       // 不启用自动重启
-      const delay = parseInt(process.env.EXIT_DELAY || '3', 10) * 1000
+      const delay = (config.exitDelay || 3) * 1000
       isExiting = true
 
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后退出进程`)  
@@ -242,8 +242,8 @@ function forkWorker(): void {
       }, delay);
     } else {
       // 启用自动重启
-      const delay = process.env.ENABLE_EXIT_DELAY === 'true'
-        ? parseInt(process.env.EXIT_DELAY || '3', 10) * 1000 // 使用自定义延迟退出时间
+      const delay = config.enableExitDelay === true
+        ? (config.exitDelay || 3) * 1000 // 使用自定义延迟退出时间
         : backoff * 1000 // 使用退避策略
 
       logger.warn(`工作进程 ${worker.id} 异常退出, code: ${code}, signal: ${signal}, ${delay / 1000}秒后重启`)
@@ -255,7 +255,7 @@ function forkWorker(): void {
       setTimeout(() => forkWorker(), delay)
 
       // 如果未启用自定义延迟, 更新退避时间
-      if (process.env.ENABLE_EXIT_DELAY !== 'true') {
+      if (config.enableExitDelay !== true) {
         backoff = Math.min(backoff * BACKOFF_FACTOR, 60)
       }
     }

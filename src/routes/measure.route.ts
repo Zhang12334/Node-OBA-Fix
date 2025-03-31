@@ -8,7 +8,7 @@ import got from 'got'
 
 export default function MeasureRouteFactory(config: Config, storage: IStorage): Router {
   const router = express.Router();
-  const storageType = process.env.CLUSTER_STORAGE || 'file';
+  const storageType = config.storage || 'file';
   router.get('/:size(\\d+)', async (req, res) => {
     // 签名验证
     const isSignValid = checkSign(req.baseUrl + req.path, config.clusterSecret, req.query as NodeJS.Dict<string>);
