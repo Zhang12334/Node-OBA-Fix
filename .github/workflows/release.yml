@@ -12,17 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            artifact_name: "Node-OBA-Fix-linux-x64.tar.xz"
-
-          - os: ubuntu-24.04-arm
-            artifact_name: "Node-OBA-Fix-linux-arm64.tar.xz"  
-
-          - os: macos-13
-            artifact_name: "Node-OBA-Fix-macos-x64.tar.xz"
-
-          - os: macos-14
-            artifact_name: "Node-OBA-Fix-macos-arm64.tar.xz"            
+       
 
           - os: windows-latest
             artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"
@@ -104,6 +94,9 @@ jobs:
       - name: "Download Artifacts"
         uses: actions/download-artifact@v4
 
+      - name: "Check Files"
+        run: ls -l
+      
       - name: "Upload to Release"
         uses: softprops/action-gh-release@v1
         with:
