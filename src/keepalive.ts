@@ -110,7 +110,7 @@ export class Keepalive {
 
     if (err) throw new Error('保活失败', {cause: err})
     const bytes = prettyBytes(counters.bytes, {binary: true})
-    logger.info(`保活成功，提供了 ${counters.hits} 个文件, 大小 ${bytes}`)
+    logger.info(`保活成功，距上一次保活期间提供了 ${counters.hits} 个文件，总大小 ${bytes} 字节`)
     this.cluster.counters.hits -= counters.hits
     this.cluster.counters.bytes -= counters.bytes
     return !!date
