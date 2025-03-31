@@ -28,8 +28,8 @@ jobs:
             artifact_name: "Node-OBA-Fix-windows-x64.tar.gz"
                  
           # 自托管 runner, 构建 Onecloud ArmV7L 镜像
-          - os: self-hosted
-            artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
+          #- os: self-hosted
+          #  artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
 
     runs-on: ${{ matrix.os }}
     steps:
