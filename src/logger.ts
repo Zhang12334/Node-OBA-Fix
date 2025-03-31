@@ -1,5 +1,6 @@
 import {pino} from 'pino'
 
+// Cluster Log
 export const logger = pino({
   level: process.env.LOGLEVEL || 'info',
   transport: process.env.PLAIN_LOG
@@ -15,6 +16,7 @@ export const logger = pino({
   }
 });
 
+// Dashboard Log
 export const dash_logger = pino({
   level: process.env.LOGLEVEL || 'info',
   transport: process.env.PLAIN_LOG
@@ -30,6 +32,7 @@ export const dash_logger = pino({
   }
 });
 
+// Sync Log
 export const sync_logger = pino({
   level: process.env.LOGLEVEL || 'info',
   transport: process.env.PLAIN_LOG
