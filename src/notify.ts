@@ -4,6 +4,10 @@ import { logger } from './logger.js';
 class Notify {
     public async send(message: string): Promise<void> {
         logger.debug("准备发送通知")
+
+        // 拼合message
+        message = `[${config.clusterName || "Cluster"}] ${message}`;
+
         try {
             if (!config.notifyEnabled) return;
 
@@ -74,7 +78,7 @@ class Notify {
             
             const requestBody = {
                 [config.notifyOnebotType === 'private' ? 'user_id' : 'group_id']: target,
-                message: `${config.clusterName ? `[${config.clusterName}] ` : ''}${message}`
+                message: message
             };
 
             const headers = {
