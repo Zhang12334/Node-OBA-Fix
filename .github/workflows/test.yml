@@ -16,7 +16,7 @@ jobs:
       - name: "设置 Node.js 编译环境"
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: "安装依赖"
@@ -35,7 +35,7 @@ jobs:
       - name: "设置 Node.js 编译环境"
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: "安装依赖"
@@ -43,6 +43,25 @@ jobs:
 
       - name: "测试构建"
         run: npm run build
+
+  build-armv7l-test:
+    name: "测试构建 - Linux ArmV7L"
+    runs-on: self-hosted  # 使用自托管 runner
+    steps:
+      - name: "获取源代码"
+        uses: actions/checkout@v4
+
+      - name: "设置 Node.js 编译环境"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: "安装依赖"
+        run: npm i --no-package-lock
+
+      - name: "测试构建"
+        run: npm run build             
 
   build-macos-x64:
     name: "测试构建 - MacOS x64"
@@ -54,7 +73,7 @@ jobs:
       - name: "设置 Node.js 编译环境"
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: "安装依赖"
@@ -73,7 +92,7 @@ jobs:
       - name: "设置 Node.js 编译环境"
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: "安装依赖"
@@ -92,11 +111,11 @@ jobs:
       - name: "设置 Node.js 编译环境"
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: "安装依赖"
         run: npm i --no-package-lock
 
       - name: "测试构建"
-        run: npm run build
+        run: npm run build   
