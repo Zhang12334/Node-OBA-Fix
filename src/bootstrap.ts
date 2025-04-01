@@ -83,7 +83,6 @@ async function createAndUploadFileToAlist(size: number) {
 }
 
 export async function bootstrap(version: string, protocol_version: string): Promise<void> {
-  logger.info(colors.green(`Booting Node-OBA-Fix`));
   logger.info(colors.green(`当前版本: ${version}`));
   logger.info(colors.green(`协议版本: ${protocol_version}`));
   logger.debug(colors.yellow(`已开启debug日志`));
