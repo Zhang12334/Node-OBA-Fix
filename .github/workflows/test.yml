@@ -1,0 +1,102 @@
+name: "构建 - 测试"
+
+on:
+  push:
+    branches:
+      - '*'  # 在任何推送时均触发
+
+jobs:
+  build-linux-x64:
+    name: "测试构建 - Linux x64"
+    runs-on: ubuntu-24.04
+    steps:
+      - name: "获取源代码"
+        uses: actions/checkout@v4
+
+      - name: "设置 Node.js 编译环境"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: "安装依赖"
+        run: npm i --no-package-lock
+
+      - name: "测试构建"
+        run: npm run build
+
+  build-linux-arm64:
+    name: "测试构建 - Linux Arm64(Aarch64)"
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: "获取源代码"
+        uses: actions/checkout@v4
+
+      - name: "设置 Node.js 编译环境"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: "安装依赖"
+        run: npm i --no-package-lock
+
+      - name: "测试构建"
+        run: npm run build
+
+  build-macos-x64:
+    name: "测试构建 - MacOS x64"
+    runs-on: macos-13
+    steps:
+      - name: "获取源代码"
+        uses: actions/checkout@v4
+
+      - name: "设置 Node.js 编译环境"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: "安装依赖"
+        run: npm i --no-package-lock
+
+      - name: "测试构建"
+        run: npm run build
+
+  build-macos-arm64:
+    name: "测试构建 - MacOS Arm64(Aarch64, Apple Silicon)"
+    runs-on: macos-14
+    steps:
+      - name: "获取源代码"
+        uses: actions/checkout@v4
+
+      - name: "设置 Node.js 编译环境"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: "安装依赖"
+        run: npm i --no-package-lock
+
+      - name: "测试构建"
+        run: npm run build
+
+  build-windows-x64:
+    name: "测试构建 - Windows x64"
+    runs-on: windows-latest
+    steps:
+      - name: "获取源代码"
+        uses: actions/checkout@v4
+
+      - name: "设置 Node.js 编译环境"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: "安装依赖"
+        run: npm i --no-package-lock
+
+      - name: "测试构建"
+        run: npm run build
