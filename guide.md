@@ -69,10 +69,7 @@ CLUSTER_PORT=你的开放端口
 ## Docker使用方法
 
 按照[设置参数](#设置参数)部分创建并配置好 `.env` 文件
-不要设置**自动更新**，请确保**ENABLE_AUTO_UPDATE=false**
-
-
-不要打开
+不要设置**自动更新**，请确保`ENABLE_AUTO_UPDATE=false`
 
 ### 使用 Docker Cli
 
