@@ -48,30 +48,37 @@ async function checkUpdate(): Promise<void> {
   logger.info(colors.green(`正在检查更新`));
   const currentVersion = config.version;
   const latestVersionUrl = "https://api.github.com/repos/Zhang12334/Node-OBA-Fix/releases/latest";
-  const response = await fetch(latestVersionUrl, {
-    headers: { "User-Agent": "Mozilla/5.0" }
-  });
-  const data = await response.json() as { tag_name: string; body: string };
-  const latestVersion = data.tag_name; // 获取最新版本
 
-  if (!latestVersion) {
-      logger.warn("检查更新失败！");
+  try {
+    const response = await fetch(latestVersionUrl, {
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+    const data = await response.json() as { tag_name: string; body: string };
+    const latestVersion = data.tag_name; // 获取最新版本
+
+    if (!latestVersion) {
+      logger.warn("检查更新失败：未获取到最新版本号！");
       return;
-  }
+    }
 
-  if (isVersionGreater(latestVersion, currentVersion)) {
+    if (isVersionGreater(latestVersion, currentVersion)) {
       logger.warn(`发现新版本: ${latestVersion}`);
       logger.warn(`更新内容如下`);
       parseMarkdownAndLog(data.body);
-      if (!config.enableAutoUpdate){
+      if (!config.enableAutoUpdate) {
         logger.warn(`下载地址: https://github.com/Zhang12334/Node-OBA-Fix/releases/latest`);
         logger.warn("旧版本可能会导致问题，请尽快更新！");
       } else {
         logger.info(`正在自动更新...`);
         await checkNpmVersion(latestVersion);
       }
-  } else {
+    } else {
       logger.info("当前已是最新版本！");
+    }
+  } catch (error: any) {
+    // 捕获错误并记录日志，但继续执行程序
+    logger.error(`检查更新失败: ${error.message}`);
+    logger.warn("请检查你的网络是否能够连接到 Github!");
   }
 }
 

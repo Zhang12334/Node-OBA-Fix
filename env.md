@@ -67,7 +67,7 @@
 | 环境变量                        | 必填                            | 默认值                | 支持的选项               | 说明                                                                                                                   |
 |--------------------------------|---------------------------------|----------------------|--------------------------|------------------------------------------------------------------------------------------------------------------------|
 | NOTIFY_ENABLED                 |  否                             | false                 | true / false            | 是否启用通知功能                                                                                                        |
-| NOTIFY_TYPE                    |  是（如果NOTIFY_ENABLED为true）  | -                     | webhook / onebot / workwechat   | 启用的通知类型                                                                                                  |
+| NOTIFY_TYPE                    |  是（如果NOTIFY_ENABLED为true）  | -                     | webhook / onebot / workwechat / dingtalk  | 启用的通知类型                                                                           |
 | NOTIFY_WEBHOOK_URL             |  是（如果通知类型为webhook）      | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 Webhook 时使用的 Webhook URL，如：NOTIFY_WEBHOOK_URL=http://127.0.0.1:8080/webhook                       |
 | NOTIFY_WEBHOOK_JSON_KEY        |  否                             | content               | 一个字符串               | Webhook 发送 JSON 的 key, 发送消息结构为 { NOTIFY_WEBHOOK_JSON_KEY: "发送的内容" }                                       |
 | NOTIFY_ONEBOT_HTTP_API         |  是（如果通知类型为onebot）       | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 OneBot 时使用的 Onebot HTTP API 地址，如：NOTIFY_ONEBOT_HTTP_API=http://127.0.0.1:8080                   |
@@ -77,6 +77,7 @@
 | NOTIFY_WORKWECHAT_WEBHOOK_URL  |  是（如果通知类型为workwechat）   | -                     | 一个 http/https 地址     | 通知类型为 workwechat 时使用的企业微信群机器人 Webhook URL, 如 https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx-xxx|
 | NOTIFY_WORKWECHAT_MENTION_LIST |  否                             | -             | 一个列表 | 企业微信通知的at列表(按照手机号at), 如 变量=18011451419,@all 为at全体和单独at手机号为18011451419的用户, 也可只设置一个at的人如 变量=@all 则只at全体       |
 | NOTIFY_WORKWECHAT_MESSAGE_TITLE_COLOR| 否                        | -                     | warning                 | 企业微信通知消息标题颜色, 支持 info(绿色) / comment(灰色) / warning(橙红色)                                                |
+| NOTIFY_DINGTALK_WEBHOOK_URL    |  是（如果通知类型为dingtalk）     | -                     | 一个 http/https 地址     | 钉钉群自定义机器人的 Webhook URL, 如 https://oapi.dingtalk.com/robot/send?access_token=xxx-xxx                           |
 | NOTIFY_DEBUG_MODE              |  否                             | false                 | true / false            | 是否启用通知调试模式（很吵，为了debug会通知一些日志，不建议开）                                                              |
 
 ### 通知消息内容
