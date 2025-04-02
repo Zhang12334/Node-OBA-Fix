@@ -90,9 +90,6 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   if (config.notifyEnabled) {
     logger.debug(colors.yellow(`已开启通知功能`));
   }
-  if (config.notifyDebugMode) {
-    notify.send(`Booting Node-OBA-Fix ${version}`)
-  }
 
   const startupFilePath = join('data', 'startup.json');
 
