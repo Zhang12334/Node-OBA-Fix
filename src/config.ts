@@ -92,6 +92,8 @@ export class Config {
   public readonly notifyWorkWechatMessageTitleColor = env.get('NOTIFY_WORKWECHAT_MESSAGE_TITLE_COLOR').asString();
   // 钉钉
   public readonly notifyDingTalkWebhookUrl = env.get('NOTIFY_DINGTALK_WEBHOOK_URL').asString();
+  // server酱
+  public readonly notifyServerChanSendKey = env.get('NOTIFY_SERVERCHAN_SENDKEY').asString();
   // debug  
   public readonly notifyDebugMode = env.get('NOTIFY_DEBUG_MODE').asBool();
 

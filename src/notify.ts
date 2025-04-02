@@ -1,5 +1,6 @@
 import { config } from './config.js';
 import { logger } from './logger.js';
+import { scSend } from 'serverchan-sdk'; 
 
 class Notify {
     public async send(message: string): Promise<void> {
@@ -19,6 +20,8 @@ class Notify {
                 await this.handleWorkWechat(message);
             } else if (config.notifyType === 'dingtalk') {
                 await this.handleDingTalk(message);
+            } else if (config.notifyType === 'serverchan') {
+                await this.handleServerChan(message);
             } else {
                 logger.error(`未知的通知类型: ${config.notifyType}`);
             }
@@ -116,6 +119,38 @@ class Notify {
         }
     }
     
+    // ServerChan
+    private async handleServerChan(message: string): Promise<void> {
+        logger.debug("准备发送 Server 酱通知");
+
+        // 检查是否配置了 Server酱 SendKey
+        if (!config.notifyServerChanSendKey) {
+            logger.error('Server 酱通知发送失败: 未配置 NOTIFY_SERVERCHAN_SENDKEY');
+            return;
+        }
+
+        // 构造消息标题
+        const title = `[${config.clusterName || "Cluster"}]`;
+
+        try {
+            // 调用 Server酱 SDK 发送消息
+            const response = await scSend(
+                config.notifyServerChanSendKey, // SendKey
+                title, // 消息标题
+                message // 消息内容
+            );
+
+            // 检查响应状态码
+            if (response.code !== 0) {
+                throw new Error(`请求状态码 ${response.code}`);
+            }
+
+            // 发送成功
+            logger.info(`Server 酱通知发送成功`);
+        } catch (error: any) {
+            logger.error(`Server 酱通知发送失败: ${error.message}`);
+        }
+    }
 
     // Webhook
     private async handleWebhook(message: string): Promise<void> {
