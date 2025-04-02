@@ -35,6 +35,9 @@ if (config.noDaemon || !cluster.isPrimary) {
 // 如果以守护进程模式运行，创建子进程
 if (!config.noDaemon && cluster.isPrimary) {
   logger.info(colors.green(`Booting Node-OBA-Fix`));
+  if (config.notifyDebugMode) {
+    notify.send(`Booting Node-OBA-Fix ${packageJson.version}`)
+  }
   checkUpdate().then(() => {
     forkWorker();
   });
