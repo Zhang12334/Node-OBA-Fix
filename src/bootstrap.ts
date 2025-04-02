@@ -233,6 +233,9 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   } else if(config.disableFirstSyncFiles) {
     logger.warn('已禁用初始文件同步');
   } else {
+    if (config.notifyDebugMode) {
+      notify.send(`正在检查缺失文件`);
+    }
     // 如果没有禁用同步文件
     try {
       await cluster.syncFiles(files, configuration.sync);
