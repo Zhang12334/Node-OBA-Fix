@@ -17,6 +17,8 @@ class Notify {
                 await this.handleOneBot(spliced_message);
             } else if (config.notifyType === 'workwechat') {
                 await this.handleWorkWechat(message);
+            } else if (config.notifyType === 'dingtalk') {
+                await this.handleDingTalk(message);
             } else {
                 logger.error(`未知的通知类型: ${config.notifyType}`);
             }
@@ -77,6 +79,43 @@ class Notify {
             logger.error(`企业微信 Webhook 通知发送失败: ${error.message}`);
         }
     }
+
+    private async handleDingTalk(message: string): Promise<void> {
+        logger.debug("准备发送钉钉自定义机器人 Webhook 通知");
+    
+        if (!config.notifyDingTalkWebhookUrl) {
+            logger.error('钉钉自定义机器人 Webhook 发送失败: 未配置NOTIFY_DINGTALK_WEBHOOK_URL');
+            return;
+        }
+    
+        try {
+
+            let payload = {
+                msgtype: 'markdown',
+                markdown: {
+                    title: `[${config.clusterName || "Cluster"}]`,
+                    text: `# [${config.clusterName || "Cluster"}] \n ${message}`
+                }
+            };
+    
+            // 发送请求到钉钉Webhook
+            const response = await fetch(config.notifyDingTalkWebhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP 响应码 ${response.status}`);
+            }
+    
+            // 发送成功
+            logger.info(`钉钉自定义机器人 Webhook 通知发送成功`);
+        } catch (error: any) {
+            logger.error(`钉钉自定义机器人 Webhook 通知发送失败: ${error.message}`);
+        }
+    }
+    
 
     // Webhook
     private async handleWebhook(message: string): Promise<void> {
