@@ -49,10 +49,10 @@ class Notify {
                 });
 
                 if (!textResponse.ok) {
-                    throw new Error(`通知消息发送失败, HTTP 响应码 ${textResponse.status}`);
+                    throw new Error(`提醒消息发送失败, HTTP 响应码 ${textResponse.status}`);
                 }
             }
-                        
+
             // 发送 Markdown 消息
             const markdownResponse = await fetch(config.notifyWorkWechatWebhookUrl, {
                 method: 'POST',
