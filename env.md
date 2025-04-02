@@ -75,7 +75,8 @@
 | NOTIFY_ONEBOT_TARGET           |  是（如果通知类型为onebot）       | -                     | 一串数字                 | 发送消息的接收目标，NOTIFY_ONEBOT_TYPE 配置为 private 时为私聊 QQ 号, 反之则为群号, 如：NOTIFY_ONEBOT_TARGET=1234567890     |
 | NOTIFY_ONEBOT_SECRET           |  否（如果配置了上报密钥则必填）    | -                     | 一个字符串               | Onebot 配置的 HTTP 上报密钥，如：NOTIFY_ONEBOT_SECRET=1234567890                                                        |
 | NOTIFY_WORKWECHAT_WEBHOOK_URL  |  是（如果通知类型为workwechat）   | -                     | 一个 http/https 地址     | 通知类型为 workwechat 时使用的企业微信群机器人 Webhook URL, 如 https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx-xxx|
-| NOTIFY_WORK_WECHAT_MENTION_LIST|  否              | -                | 一个列表            | 企业微信通知的at列表(按照手机号at), 如 变量=18011451419,@all 为at全体和单独at手机号为18011451419的用户, 也可只设置一个at的人如 变量=@all 则只at全体       |
+| NOTIFY_WORKWECHAT_MENTION_LIST |  否                             | -             | 一个列表 | 企业微信通知的at列表(按照手机号at), 如 变量=18011451419,@all 为at全体和单独at手机号为18011451419的用户, 也可只设置一个at的人如 变量=@all 则只at全体       |
+| NOTIFY_WORKWECHAT_MESSAGE_TITLE_COLOR| 否                        | -                     | warning                 | 企业微信通知消息标题颜色, 支持 info(绿色) / comment(灰色) / warning(橙红色)                                                |
 | NOTIFY_DEBUG_MODE              |  否                             | false                 | true / false            | 是否启用通知调试模式（很吵，为了debug会通知一些日志，不建议开）                                                              |
 
 ### 通知消息内容

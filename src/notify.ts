@@ -60,7 +60,8 @@ class Notify {
                 body: JSON.stringify({
                     msgtype: 'markdown',
                     markdown: {
-                        content: `### <font color="warning">[${config.clusterName || "Cluster"}]</font>\n` +
+                        // 动态构建标题颜色
+                        content: `### <font color="${config.notifyWorkWechatMessageTitleColor || "warning"}">[${config.clusterName || "Cluster"}]</font>\n` +
                                 `${message}\n`,
                     },
                 }),

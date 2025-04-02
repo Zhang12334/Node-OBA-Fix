@@ -83,9 +83,10 @@ export class Config {
   public readonly notifyOnebotType = env.get('NOTIFY_ONEBOT_TYPE').asString();
   public readonly notifyOnebotTarget = env.get('NOTIFY_ONEBOT_TARGET').asString();
   public readonly notifyWorkWechatWebhookUrl = env.get('NOTIFY_WORKWECHAT_WEBHOOK_URL').asString();
-  public readonly notifyWorkWechatMentionList: string[] = env.get('NOTIFY_WORK_WECHAT_MENTION_LIST')
+  public readonly notifyWorkWechatMentionList: string[] = env.get('NOTIFY_WORKWECHAT_MENTION_LIST')
     ?.asString()
     ?.split(',') ?? [];
+  public readonly notifyWorkWechatMessageTitleColor = env.get('NOTIFY_WORKWECHAT_MESSAGE_TITLE_COLOR').asString();
   public readonly notifyDebugMode = env.get('NOTIFY_DEBUG_MODE').asBool();
 
   // 通知消息内容
