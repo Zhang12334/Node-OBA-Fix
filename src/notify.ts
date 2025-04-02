@@ -3,6 +3,22 @@ import { logger } from './logger.js';
 import { scSend } from 'serverchan-sdk'; 
 
 class Notify {
+    // 递归替换占位符的辅助方法
+    private replacePlaceholders(obj: any, variables: Record<string, string>): any {
+        if (typeof obj === 'string') {
+            return obj.replace(/\${(.*?)}/g, (_, key) => variables[key] || '');
+        } else if (Array.isArray(obj)) {
+            return obj.map(item => this.replacePlaceholders(item, variables));
+        } else if (obj !== null && typeof obj === 'object') {
+            const cloned: { [key: string]: any } = {};
+            for (const [k, v] of Object.entries(obj)) {
+                cloned[k] = this.replacePlaceholders(v, variables);
+            }
+            return cloned;
+        }
+        return obj;
+    }
+
     public async send(message: string): Promise<void> {
         logger.debug("准备发送通知")
 
@@ -13,7 +29,7 @@ class Notify {
             if (!config.notifyEnabled) return;
 
             if (config.notifyType === 'webhook') {
-                await this.handleWebhook(spliced_message);
+                await this.handleWebhook(message, spliced_message);
             } else if (config.notifyType === 'onebot') {
                 await this.handleOneBot(spliced_message);
             } else if (config.notifyType === 'workwechat') {
@@ -152,31 +168,60 @@ class Notify {
         }
     }
 
-    // Webhook
-    private async handleWebhook(message: string): Promise<void> {
-        logger.debug("准备发送Webhook通知")
+    // Webhook 通知处理
+    private async handleWebhook(rawMessage: string, processedMessage: string): Promise<void> {
+        logger.debug("准备发送 Webhook 通知")
         if (!config.notifyWebhookUrl) {
-            logger.error('Webhook通知发送失败: 未配置NOTIFY_WEBHOOK_URL');
+            logger.error('Webhook 通知发送失败: 未配置 NOTIFY_WEBHOOK_URL');
             return;
         }
 
         try {
-            // 读取自定义Json Key
-            let key = config.notifyWebhookJsonKey || "content";
+            const prefix = config.clusterName || 'Cluster';
+            const now = new Date();
+            // 格式化日期为 YYYY-MM-DD
+            const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            // 格式化时间为 HH:MM:SS
+            const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            // 格式化日期时间为 YYYY-MM-DD HH:MM:SS
+            const datetime = `${date} ${time}`;
+            // 变量列表
+            const variables = {
+                raw_message: rawMessage,
+                message: processedMessage,
+                prefix: prefix,
+                timestamp: String(Date.now()), // 当前时间戳
+                datetime: datetime, // 格式化的日期时间
+                date: date, // 格式化的日期
+                time: time, // 格式化的时间
+            };
+            
+            
+
+            // 构造请求体
+            let requestBody: object;
+            if (config.notifyWebhookCustomJson) {
+                // 解析自定义 JSON 模板
+                const customTemplate = JSON.parse(config.notifyWebhookCustomJson);
+                requestBody = this.replacePlaceholders(customTemplate, variables);
+            } else {
+                // 不使用自定义模板
+                const key = config.notifyWebhookJsonKey || "content";
+                requestBody = { [key]: processedMessage };
+            }
 
             const response = await fetch(config.notifyWebhookUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }, // Json格式
-                body: JSON.stringify({ [key]: message })
-            });            
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
 
             if (!response.ok) {
                 throw new Error(`HTTP 响应码 ${response.status}`);
             }
-            // 发送成功
-            logger.info(`Webhook通知发送成功`);            
+            logger.info('Webhook 通知发送成功');
         } catch (error: any) {
-            logger.error(`Webhook通知发送失败: ${error.message}`);
+            logger.error(`Webhook 通知发送失败: ${error.message}`);
         }
     }
 
