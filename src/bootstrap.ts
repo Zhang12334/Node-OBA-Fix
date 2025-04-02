@@ -83,12 +83,16 @@ async function createAndUploadFileToAlist(size: number) {
 }
 
 export async function bootstrap(version: string, protocol_version: string): Promise<void> {
+  logger.info(colors.green(`Booting Node-OBA-Fix`));
   logger.info(colors.green(`当前版本: ${version}`));
   logger.info(colors.green(`协议版本: ${protocol_version}`));
   logger.debug(colors.yellow(`已开启debug日志`));
 
   if (config.notifyEnabled) {
     logger.debug(colors.yellow(`已开启通知功能`));
+  }
+  if (config.notifyDebugMode) {
+    notify.send(`Booting Node-OBA-Fix ${version}`)
   }
 
   const startupFilePath = join('data', 'startup.json');
@@ -139,7 +143,7 @@ export async function bootstrap(version: string, protocol_version: string): Prom
           if (isExceedLimit(startupTimes, startuplimit)) {
             logger.warn(`24h 内上线次数超过 ${startuplimit} 次, 已取消启动`);
             clearInterval(interval); // 停止定时器
-            reject(new Error('启动次数超限')); // 拒绝 Promise 
+            reject(new Error('启动次数超限')); // 拒绝 Promise
           } else {
             resolve(); // 检查通过，启动!
           }
@@ -233,9 +237,6 @@ export async function bootstrap(version: string, protocol_version: string): Prom
   } else if(config.disableFirstSyncFiles) {
     logger.warn('已禁用初始文件同步');
   } else {
-    if (config.notifyDebugMode) {
-      notify.send(`正在检查缺失文件`);
-    }
     // 如果没有禁用同步文件
     try {
       await cluster.syncFiles(files, configuration.sync);

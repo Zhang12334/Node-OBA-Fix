@@ -64,23 +64,17 @@
 
 ### 通知渠道及其对应地址配置
 
-| 环境变量                        | 必填                            | 默认值                | 支持的选项               | 说明                                                                                                                   |
-|--------------------------------|---------------------------------|----------------------|--------------------------|------------------------------------------------------------------------------------------------------------------------|
-| NOTIFY_ENABLED                 |  否                             | false                 | true / false            | 是否启用通知功能                                                                                                        |
-| NOTIFY_TYPE                    |  是（如果NOTIFY_ENABLED为true）  | -                     | webhook / onebot / workwechat / dingtalk / serverchan | 启用的通知类型                                                                           |
-| NOTIFY_WEBHOOK_URL             |  是（如果通知类型为webhook）      | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 Webhook 时使用的 Webhook URL，如：NOTIFY_WEBHOOK_URL=http://127.0.0.1:8080/webhook                       |
-| NOTIFY_WEBHOOK_JSON_KEY        |  否                             | content               | 一个字符串               | 未配置 NOTIFY_WEBHOOK_CUSTOM_JSON 时 Webhook 发送 JSON 的 key, 发送消息结构为 { NOTIFY_WEBHOOK_JSON_KEY: "发送的内容" }                                       |
-| `NOTIFY_WEBHOOK_CUSTOM_JSON` | 否       | -      | 一个 JSON 字符串    | 用于自定义 Webhook 发送的 JSON 内容，支持 `${}` 占位符，可动态替换为以下变量：<br> - `${raw_message}`：原始消息内容<br> - `${message}`：处理后的消息内容（带前缀）<br> - `${prefix}`：前缀，默认为 `CLUSTER_NAME` 环境变量的值，若未设置则使用默认值 `Cluster`<br> - `${timestamp}`：当前时间戳（毫秒）<br> - `${datetime}`：ISO 格式的日期时间<br> - `${date}`：本地日期<br> - `${time}`：本地时间<br> 示例：`NOTIFY_WEBHOOK_CUSTOM_JSON='{ "message": "${prefix}\n${raw_message}\n${datetime}" }'` |
-| NOTIFY_ONEBOT_HTTP_API         |  是（如果通知类型为onebot）       | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 OneBot 时使用的 Onebot HTTP API 地址，如：NOTIFY_ONEBOT_HTTP_API=http://127.0.0.1:8080                   |
-| NOTIFY_ONEBOT_TYPE             |  是（如果通知类型为onebot）       | -                     | group / private         | 发送消息的聊天类型, private 为私聊，group 为群聊                                                                          |
-| NOTIFY_ONEBOT_TARGET           |  是（如果通知类型为onebot）       | -                     | 一串数字                 | 发送消息的接收目标，NOTIFY_ONEBOT_TYPE 配置为 private 时为私聊 QQ 号, 反之则为群号, 如：NOTIFY_ONEBOT_TARGET=1234567890     |
-| NOTIFY_ONEBOT_SECRET           |  否（如果配置了上报密钥则必填）    | -                     | 一个字符串               | Onebot 配置的 HTTP 上报密钥，如：NOTIFY_ONEBOT_SECRET=1234567890                                                        |
-| NOTIFY_WORKWECHAT_WEBHOOK_URL  |  是（如果通知类型为workwechat）   | -                     | 一个 http/https 地址     | 通知类型为 workwechat 时使用的企业微信群机器人 Webhook URL, 如 https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx-xxx|
-| NOTIFY_WORKWECHAT_MENTION_LIST |  否                             | -             | 看介绍有说明 | 企业微信通知的at列表(按照手机号at) <br> 如 NOTIFY_WORKWECHAT_MENTION_LIST=18011451419,@all <br> 为at全体和单独at手机号为18011451419的用户, 也可只设置一个at的人如 <br> NOTIFY_WORKWECHAT_MENTION_LIST=@all 则只at全体       |
-| NOTIFY_WORKWECHAT_MESSAGE_TITLE_COLOR| 否                        | -                     | info(绿色) / comment(灰色) / warning(橙红色)       | 企业微信通知消息标题颜色                                                                        |
-| NOTIFY_DINGTALK_WEBHOOK_URL    |  是（如果通知类型为dingtalk）     | -                     | 一个 http/https 地址     | 钉钉群自定义机器人的 Webhook URL, 如 https://oapi.dingtalk.com/robot/send?access_token=xxx-xxx                           |
-| NOTIFY_SERVERCHAN_SENDKEY      |  是（如果通知类型为serverchan）  | -                     | 一个字符串               | ServerChan 的 SendKey, 兼容 ServerChan3 和 ServerChanTurbo                                                              |
-| NOTIFY_DEBUG_MODE              |  否                             | false                 | true / false            | 是否启用通知调试模式（很吵，为了debug会通知一些日志，不建议开）                                                              |
+| 环境变量                    | 必填                            | 默认值                | 支持的选项               | 说明                                                                                                                   |
+|----------------------------|---------------------------------|----------------------|--------------------------|------------------------------------------------------------------------------------------------------------------------|
+| NOTIFY_ENABLED             |  否                             | false                 | true / false            | 是否启用通知功能                                                                                                        |
+| NOTIFY_TYPE                |  是（如果NOTIFY_ENABLED为true）  | -                     | webhook / onebot        | 启用的通知类型                                                                                                          |
+| NOTIFY_WEBHOOK_URL         |  是（如果NOTIFY_TYPE为webhook）  | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 Webhook 时使用的 Webhook URL，如：NOTIFY_WEBHOOK_URL=http://127.0.0.1:8080/webhook                       |
+| NOTIFY_WEBHOOK_JSON_KEY    |  否                             | content               | 一个字符串               | Webhook 发送 JSON 的 key, 发送消息结构为 { NOTIFY_WEBHOOK_JSON_KEY: "发送的内容" }                                       |
+| NOTIFY_ONEBOT_HTTP_API     |  是（如果NOTIFY_TYPE为onebot）   | -                     | 一个 http/https 地址     | NOTIFY_TYPE 为 OneBot 时使用的 Onebot HTTP API 地址，如：NOTIFY_ONEBOT_HTTP_API=http://127.0.0.1:8080                   |
+| NOTIFY_ONEBOT_SECRET       |  否（如果配置了上报密钥则必填）    | -                     | 一个字符串               | Onebot 配置的 HTTP 上报密钥，如：NOTIFY_ONEBOT_SECRET=1234567890                                                        |
+| NOTIFY_ONEBOT_TYPE         |  是（如果NOTIFY_TYPE为onebot）   | -                     | group / private         | 发送消息的聊天类型, private 为私聊，group 为群聊                                                                          |
+| NOTIFY_ONEBOT_TARGET       |  是（如果NOTIFY_TYPE为onebot）   | -                     | 一串数字                 | 发送消息的接收目标，NOTIFY_ONEBOT_TYPE 配置为 private 时为私聊 QQ 号, 反之则为群号, 如：NOTIFY_ONEBOT_TARGET=1234567890     |
+| NOTIFY_DEBUG_MODE          |  否                             | false                 | true / false            | 是否启用通知调试模式（很吵，为了debug会通知一些日志，不建议开）                                                              |
 
 ### 通知消息内容
 

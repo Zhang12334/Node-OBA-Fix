@@ -1,5 +1,4 @@
 import {pino} from 'pino'
-import {config} from './config.js'
 
 // Cluster Log
 export const logger = pino({
@@ -12,7 +11,7 @@ export const logger = pino({
       colorize: true,
       translateTime: 'SYS:yyyy-mm-dd HH:MM:ss',
       ignore: 'pid,hostname',
-      messageFormat: `[${config.clusterName || 'Cluster'}] {msg}`
+      messageFormat: '[Cluster] {msg}'
     }
   }
 });

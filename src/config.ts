@@ -76,26 +76,12 @@ export class Config {
   // 通知配置项
   public readonly notifyEnabled = env.get('NOTIFY_ENABLED').asBool();
   public readonly notifyType = env.get('NOTIFY_TYPE').asString();
-  // Webhook
   public readonly notifyWebhookUrl = env.get('NOTIFY_WEBHOOK_URL').asString();
   public readonly notifyWebhookJsonKey = env.get('NOTIFY_WEBHOOK_JSON_KEY').asString();
-  public readonly notifyWebhookCustomJson = env.get('NOTIFY_WEBHOOK_CUSTOM_JSON').asString();
-  // Onebot
   public readonly notifyOnebotHttpApi = env.get('NOTIFY_ONEBOT_HTTP_API').asString();
   public readonly notifyOnebotSecret = env.get('NOTIFY_ONEBOT_SECRET').asString();
   public readonly notifyOnebotType = env.get('NOTIFY_ONEBOT_TYPE').asString();
   public readonly notifyOnebotTarget = env.get('NOTIFY_ONEBOT_TARGET').asString();
-  // 企业微信
-  public readonly notifyWorkWechatWebhookUrl = env.get('NOTIFY_WORKWECHAT_WEBHOOK_URL').asString();
-  public readonly notifyWorkWechatMentionList: string[] = env.get('NOTIFY_WORKWECHAT_MENTION_LIST')
-    ?.asString()
-    ?.split(',') ?? [];
-  public readonly notifyWorkWechatMessageTitleColor = env.get('NOTIFY_WORKWECHAT_MESSAGE_TITLE_COLOR').asString();
-  // 钉钉
-  public readonly notifyDingTalkWebhookUrl = env.get('NOTIFY_DINGTALK_WEBHOOK_URL').asString();
-  // server酱
-  public readonly notifyServerChanSendKey = env.get('NOTIFY_SERVERCHAN_SENDKEY').asString();
-  // debug  
   public readonly notifyDebugMode = env.get('NOTIFY_DEBUG_MODE').asBool();
 
   // 通知消息内容
