@@ -65,6 +65,55 @@ CLUSTER_SECRET=你的节点密钥
 CLUSTER_PORT=你的开放端口
 # 更多变量请看上方的配置项说明文档
 ```
+
+## Docker使用方法
+
+按照[设置参数](#设置参数)部分创建并配置好 `.env` 文件
+不要设置**自动更新**，请确保`ENABLE_AUTO_UPDATE=false`
+
+### 使用 Docker Cli
+
+```bash
+docker run -d --name node-oba-fix \
+  -p 4000:4000 \
+  -v /openbmclapi/cache:/opt/openbmclapi/cache \
+  -v /openbmclapi/env:/opt/openbmclapi/.env \
+  -v /openbmclapi/data:/opt/openbmclapi/data \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped \
+  ylovexln/node-oba-fix:latest
+```
+
+### 使用 Docker Compose
+
+在项目根目录创建 `docker-compose.yml` 文件，写入以下内容：
+
+```yaml
+version: '3.8'
+
+services:
+  openbmclapi:
+    image: ylovexln/node-oba-fix:latest
+    container_name: node-oba-fix
+    network_mode: "bridge"
+    environment:
+      - CLUSTER_PORT=4000
+      - TZ=Asia/Shanghai
+    ports:
+      - "4000:4000"
+    volumes:
+      - /openbmclapi/cache:/opt/openbmclapi/cache
+      - /openbmclapi/.env:/opt/openbmclapi/.env
+      - /openbmclapi/data:/opt/openbmclapi/data
+    restart: unless-stopped
+```
+
+然后运行以下命令启动容器：
+
+```bash
+docker-compose up -d
+```
+
 ## Alist使用方法
 在.env中加上
 ```env
