@@ -78,48 +78,48 @@ jobs:
 
 
 
-  build-full-install-zip-armv7l:
-    name: "构建 - 全量安装包 [ArmV7L]"
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # 自托管 Onecloud runner, 构建 ArmV7L 发行版
-          - os: self-hosted
-            artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
+  # build-full-install-zip-armv7l:
+  #   name: "构建 - 全量安装包 [ArmV7L]"
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         # 自托管 Onecloud runner, 构建 ArmV7L 发行版
+  #         - os: self-hosted
+  #           artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
 
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: "获取源代码"
-        uses: actions/checkout@v4
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: "获取源代码"
+  #       uses: actions/checkout@v4
 
-      - name: "设置 Node.js 编译环境"
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+  #     - name: "设置 Node.js 编译环境"
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '22'
+  #         cache: 'npm'
 
-      - name: "安装依赖"
-        run: npm i --no-package-lock
+  #     - name: "安装依赖"
+  #       run: npm i --no-package-lock
 
-      - name: "构建"
-        run: npm run build
+  #     - name: "构建"
+  #       run: npm run build
 
-      ## Linux & MacOS
-      - name: "复制 Node.js 和运行脚本"
-        run: |
-          cp $(which node) .
-          cp platforms/linux/run.sh .
+  #     ## Linux & MacOS
+  #     - name: "复制 Node.js 和运行脚本"
+  #       run: |
+  #         cp $(which node) .
+  #         cp platforms/linux/run.sh .
 
-      - name: "打包为 tar.xz 文件"
-        run: |
-          tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
+  #     - name: "打包为 tar.xz 文件"
+  #       run: |
+  #         tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
 
-      - name: "上传文件"
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_name }}          
+  #     - name: "上传文件"
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ matrix.artifact_name }}
+  #         path: ${{ matrix.artifact_name }}          
 
   build-update-zip:
     name: "构建 - 增量更新包"
