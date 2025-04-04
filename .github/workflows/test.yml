@@ -33,7 +33,7 @@ jobs:
 
       - name: "打包为 tar.xz 文件"
         run: |
-          tar -caf build-linux-x64.tar.xz dist nginx package.json node_modules
+          tar -caf build-linux-x64.tar.xz dist nginx package.json node_modules node run.sh
 
       - name: "上传文件"
         uses: actions/upload-artifact@v4
@@ -68,7 +68,7 @@ jobs:
 
       - name: "打包为 tar.xz 文件"
         run: |
-          tar -caf build-linux-arm64.tar.xz dist nginx package.json node_modules
+          tar -caf build-linux-arm64.tar.xz dist nginx package.json node_modules node run.sh
 
       - name: "上传文件"
         uses: actions/upload-artifact@v4
@@ -124,7 +124,7 @@ jobs:
 
       - name: "打包为 tar.xz 文件"
         run: |
-          tar -caf build-macos-x64.tar.xz dist nginx package.json node_modules
+          tar -caf build-macos-x64.tar.xz dist nginx package.json node_modules node run.sh
 
       - name: "上传文件"
         uses: actions/upload-artifact@v4
@@ -159,7 +159,7 @@ jobs:
 
       - name: "打包为 tar.xz 文件"
         run: |
-          tar -caf build-macos-arm64.tar.xz dist nginx package.json node_modules
+          tar -caf build-macos-arm64.tar.xz dist nginx package.json node_modules node run.sh
 
       - name: "上传文件"
         uses: actions/upload-artifact@v4
@@ -195,7 +195,7 @@ jobs:
 
       - name: "打包为 tar.gz 文件"
         run: |
-          tar -caf build-windows-x64.tar.gz dist nginx package.json node_modules
+          tar -caf build-windows-x64.tar.gz dist nginx package.json node_modules node.exe run.ps1
 
       - name: "上传文件"
         uses: actions/upload-artifact@v4
