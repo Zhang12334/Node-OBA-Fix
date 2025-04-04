@@ -14,6 +14,7 @@ import AdmZip from 'adm-zip';
 import fetch from 'node-fetch';
 import fs from 'fs';
 
+// 加载版本信息
 const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8')) as {
   protocol_version: string
   version: string
@@ -24,9 +25,9 @@ dotenvConfig()
 
 // 如果以非守护进程模式运行，直接启动应用
 if (config.noDaemon || !cluster.isPrimary) {
-  bootstrap(packageJson.version, packageJson.protocol_version).catch((err) => {
+  bootstrap(packageJson.protocol_version).catch((err) => {
     // eslint-disable-next-line no-console
-    console.error(err)
+    logger.error(err)
     // eslint-disable-next-line n/no-process-exit
     process.exit(1)
   })
@@ -35,6 +36,8 @@ if (config.noDaemon || !cluster.isPrimary) {
 // 如果以守护进程模式运行，创建子进程
 if (!config.noDaemon && cluster.isPrimary) {
   logger.info(colors.green(`Booting Node-OBA-Fix`));
+  logger.info(colors.green(`当前版本: ${packageJson.version}`));
+  logger.info(colors.green(`协议版本: ${packageJson.protocol_version}`));  
   if (config.notifyDebugMode) {
     notify.send(`Booting Node-OBA-Fix ${packageJson.version}`)
   }

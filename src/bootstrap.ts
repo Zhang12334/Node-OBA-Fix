@@ -82,9 +82,7 @@ async function createAndUploadFileToAlist(size: number) {
   return;
 }
 
-export async function bootstrap(version: string, protocol_version: string): Promise<void> {
-  logger.info(colors.green(`当前版本: ${version}`));
-  logger.info(colors.green(`协议版本: ${protocol_version}`));
+export async function bootstrap(protocol_version: string): Promise<void> {
   logger.debug(colors.yellow(`已开启debug日志`));
 
   if (config.notifyEnabled) {
