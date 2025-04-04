@@ -25,6 +25,12 @@ jobs:
       - name: "测试构建"
         run: npm run build
 
+      ## Linux & MacOS
+      - name: "复制 Node.js 和运行脚本"
+        run: |
+          cp $(which node) .
+          cp platforms/linux/run.sh .
+
       - name: "打包为 tar.xz 文件"
         run: |
           tar -caf build-linux-x64.tar.xz dist nginx package.json node_modules
@@ -53,6 +59,12 @@ jobs:
 
       - name: "测试构建"
         run: npm run build
+
+      ## Linux & MacOS
+      - name: "复制 Node.js 和运行脚本"
+        run: |
+          cp $(which node) .
+          cp platforms/linux/run.sh .
 
       - name: "打包为 tar.xz 文件"
         run: |
@@ -104,6 +116,12 @@ jobs:
       - name: "测试构建"
         run: npm run build
 
+      ## Linux & MacOS
+      - name: "复制 Node.js 和运行脚本"
+        run: |
+          cp $(which node) .
+          cp platforms/linux/run.sh .
+
       - name: "打包为 tar.xz 文件"
         run: |
           tar -caf build-macos-x64.tar.xz dist nginx package.json node_modules
@@ -132,6 +150,12 @@ jobs:
 
       - name: "测试构建"
         run: npm run build
+        
+      ## Linux & MacOS
+      - name: "复制 Node.js 和运行脚本"
+        run: |
+          cp $(which node) .
+          cp platforms/linux/run.sh .
 
       - name: "打包为 tar.xz 文件"
         run: |
@@ -161,6 +185,13 @@ jobs:
 
       - name: "测试构建"
         run: npm run build   
+
+      ## Windows
+      - name: "复制 Node.js 和运行脚本"
+        run: |
+          $SRC = (Get-Command node.exe).Path
+          copy $SRC node.exe
+          copy platforms/windows/run.ps1 .
 
       - name: "打包为 tar.gz 文件"
         run: |
