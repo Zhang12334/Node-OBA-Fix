@@ -8,9 +8,8 @@
 
 ### 一个 OpenBMCLAPI 官方 Node.JS 节点端的修改版本, 提供多种额外功能
 
-**Windows** x64  
-**MacOS** x64 | Arm64  
-**Linux** x64 | Arm64 (Aarch64) | ArmV7L  
+**Windows** [ x64 ]<br>
+**MacOS & Linux** [ x64 | Arm64 ] 
 
 [发行版列表](https://github.com/Zhang12334/Node-OBA-Fix/releases) | [📖使用教程📖](guide.md) | [Issues页面](https://github.com/Zhang12334/Node-OBA-Fix/issues)
   
