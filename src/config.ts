@@ -55,6 +55,7 @@ export class Config {
   public readonly restartProcess = env.get('RESTART_PROCESS').asBool()  
   public readonly enableExitDelay = env.get('ENABLE_EXIT_DELAY').asBool()
   public readonly exitDelay = env.get('EXIT_DELAY').asInt()
+  public readonly disableWebdav302Cache = env.get('DISABLE_WEBDAV_302_CACHE').asBool() // 禁用302地址缓存
 
   // 调试配置项
   public readonly allowNoSign = env.get('CLUSTER_ALLOW_NO_SIGN').asBool()

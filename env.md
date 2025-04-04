@@ -40,6 +40,7 @@
 | RESTART_PROCESS            |  否  | true                   | 在当前进程意外退出后调用自身功能自动重启进程                                                                                                      |
 | ENABLE_EXIT_DELAY          |  否  | false                  | 使用自定义固定秒数而非内置退避策略的重启前等待时间                                                                                                |
 | EXIT_DELAY                 |  否  | 3                      | 在重启/退出前进行自定义秒数的延迟                                                                                                                |
+| DISABLE_WEBDAV_302_CACHE   |  否  | false                  | 是否禁用 webdav 302 缓存，默认不禁用，禁用后使用 webdav 存储时会每次都请求地址而不是检查缓存，会增大CPU占用（若不禁用则增大内存占用）                   |
 
 ## 文件同步配置项
 

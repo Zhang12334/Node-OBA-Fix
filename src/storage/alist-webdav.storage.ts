@@ -7,6 +7,7 @@ import {join} from 'path'
 import {z} from 'zod'
 import {fromZodError} from 'zod-validation-error'
 import {WebdavStorage} from './webdav.storage.js'
+import {config} from '../config.js'
 
 const storageConfigSchema = WebdavStorage.configSchema.extend({
   cacheTtl: z.union([z.string().optional(), z.number().int()]).default('1h'),
@@ -50,11 +51,14 @@ export class AlistWebdavStorage extends WebdavStorage {
       res.end()
       return {bytes: 0, hits: 1}
     }
-    const cachedUrl = await this.redirectUrlCache.get(hashPath)
     const size = this.getSize(this.files.get(req.params.hash)?.size ?? 0, req.headers.range)
-    if (cachedUrl) {
-      res.status(302).location(cachedUrl).send()
-      return {bytes: size, hits: 1}
+    if (!config.disableWebdav302Cache){
+      // 如果没有禁用302缓存，查询缓存，如果存在则直接返回
+      const cachedUrl = await this.redirectUrlCache.get(hashPath)
+      if (cachedUrl) {
+        res.status(302).location(cachedUrl).send()
+        return {bytes: size, hits: 1}
+      }
     }
     const path = join(this.basePath, hashPath)
     const url = this.client.getFileDownloadLink(path)
