@@ -162,12 +162,12 @@ jobs:
       - name: "测试构建"
         run: npm run build   
 
-      - name: "打包为 tar.xz 文件"
+      - name: "打包为 tar.gz 文件"
         run: |
-          tar -caf build-windows-x64.tar.xz dist nginx package.json node_modules
+          tar -caf build-windows-x64.tar.gz dist nginx package.json node_modules
 
       - name: "上传文件"
         uses: actions/upload-artifact@v4
         with:
           name: build-windows-x64
-          path: build-windows-x64.tar.xz   
+          path: build-windows-x64.tar.gz   
