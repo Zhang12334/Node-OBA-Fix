@@ -25,6 +25,16 @@ jobs:
       - name: "测试构建"
         run: npm run build
 
+      - name: "打包为 tar.xz 文件"
+        run: |
+          tar -caf build-linux-x64.tar.xz dist nginx package.json node_modules
+
+      - name: "上传文件"
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-linux-x64
+          path: build-linux-x64.tar.xz
+
   build-linux-arm64:
     name: "测试构建 - Linux Arm64(Aarch64)"
     runs-on: ubuntu-24.04-arm
@@ -43,6 +53,16 @@ jobs:
 
       - name: "测试构建"
         run: npm run build
+
+      - name: "打包为 tar.xz 文件"
+        run: |
+          tar -caf build-linux-arm64.tar.xz dist nginx package.json node_modules
+
+      - name: "上传文件"
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-linux-arm64
+          path: build-linux-arm64.tar.xz
 
   # 去掉, 无需测试ArmV7L
 
@@ -84,6 +104,16 @@ jobs:
       - name: "测试构建"
         run: npm run build
 
+      - name: "打包为 tar.xz 文件"
+        run: |
+          tar -caf build-macos-x64.tar.xz dist nginx package.json node_modules
+
+      - name: "上传文件"
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-macos-x64
+          path: build-macos-x64.tar.xz        
+
   build-macos-arm64:
     name: "测试构建 - MacOS Arm64(Aarch64, Apple Silicon)"
     runs-on: macos-14
@@ -103,6 +133,16 @@ jobs:
       - name: "测试构建"
         run: npm run build
 
+      - name: "打包为 tar.xz 文件"
+        run: |
+          tar -caf build-macos-arm64.tar.xz dist nginx package.json node_modules
+
+      - name: "上传文件"
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-macos-arm64
+          path: build-macos-arm64.tar.xz              
+
   build-windows-x64:
     name: "测试构建 - Windows x64"
     runs-on: windows-latest
@@ -121,3 +161,13 @@ jobs:
 
       - name: "测试构建"
         run: npm run build   
+
+      - name: "打包为 tar.xz 文件"
+        run: |
+          tar -caf build-windows-x64.tar.xz dist nginx package.json node_modules
+
+      - name: "上传文件"
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-windows-x64
+          path: build-windows-x64.tar.xz   
