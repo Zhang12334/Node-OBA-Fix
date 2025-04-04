@@ -75,7 +75,7 @@ CLUSTER_PORT=你的开放端口
 
 ```bash
 docker run -d --name node-oba-fix \
-  -p 4000:4000 \
+  -p ${CLUSTER_PORT}:${CLUSTER_PORT} \
   -v /openbmclapi/cache:/opt/openbmclapi/cache \
   -v /openbmclapi/env:/opt/openbmclapi/.env \
   -v /openbmclapi/data:/opt/openbmclapi/data \
@@ -97,10 +97,10 @@ services:
     container_name: node-oba-fix
     network_mode: "bridge"
     environment:
-      - CLUSTER_PORT=4000
+      - CLUSTER_PORT=${CLUSTER_PORT}
       - TZ=Asia/Shanghai
     ports:
-      - "4000:4000"
+      - "${CLUSTER_PORT}:${CLUSTER_PORT}"
     volumes:
       - /openbmclapi/cache:/opt/openbmclapi/cache
       - /openbmclapi/.env:/opt/openbmclapi/.env
