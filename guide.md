@@ -201,3 +201,5 @@ openbmclapi 会自行同步需要的文件, 但是初次同步可能会速度过
 
 - [**bangbang93**](https://github.com/bangbang93) 本项目 Fork 自 bangbang93 的 [OpenBMCLAPI](https://github.com/bangbang93/openbmclapi/) 项目
 - [**ApliNi**](https://github.com/ApliNi) Dashboard API 改自 ApliNi 的 [aplPanel](https://github.com/ApliNi/aplPanel) 项目
+- [**Uright-Xuqing233**](https://github.com/Uright-Xuqing233) 帮助提供 Docker 构建文件 & 修改 MinIO 相关代码
+- [**YlovexLN**](https://github.com/YlovexLN) 帮助提供 Docker 相关配置 & 修改文档
