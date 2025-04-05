@@ -15,7 +15,7 @@ WORKDIR /opt/openbmclapi
 RUN apt update && \
     apt install -y build-essential python3
 COPY package-lock.json package.json ./
-RUN npm ci --omit=dev
+RUN npm i --no-package-lock
 
 FROM $BASE_IMAGE AS build
 
