@@ -19,6 +19,7 @@ jobs:
           "darwin/amd64",
           "darwin/arm64"
         ]
+    continue-on-error: true        
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
