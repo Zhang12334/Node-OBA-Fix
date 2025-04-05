@@ -81,7 +81,7 @@ docker run -d --name node-oba-fix \
   -v /openbmclapi/data:/opt/openbmclapi/data \
   -e TZ=Asia/Shanghai \
   --restart unless-stopped \
-  ylovexln/node-oba-fix:latest
+  zhang134/node-oba-fix:latest
 ```
 
 ### 使用 Docker Compose
@@ -93,7 +93,7 @@ version: '3.8'
 
 services:
   openbmclapi:
-    image: ylovexln/node-oba-fix:latest
+    image: zhang134/node-oba-fix:latest
     container_name: node-oba-fix
     network_mode: "bridge"
     environment:
