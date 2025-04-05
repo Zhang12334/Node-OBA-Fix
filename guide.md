@@ -114,6 +114,27 @@ services:
 docker-compose up -d
 ```
 
+## S3使用方法
+
+S3配置: 
+```env
+CLUSTER_STORAGE=minio
+CLUSTER_STORAGE_OPTIONS={"url": "http://ak:sk@someminio/bucket/prefix"}
+```
+
+对于内外网分开访问的情况: 
+```env
+CLUSTER_STORAGE=minio
+CLUSTER_STORAGE_OPTIONS={"url": "http://ak:sk@someminio/bucket/prefix", "internalUrl": "http://ak:sk@192.168.1.1/bucket/prefix"}
+```
+url是用户访问时重定向到的，internal是节点端访问api时使用的
+
+也支持自定义host: 
+```env
+CLUSTER_STORAGE=minio
+CLUSTER_STORAGE_OPTIONS={"url": "http://ak:sk@someminio/bucket/prefix", "customHost":"http://someminio/prefix"}
+```
+
 ## Alist使用方法
 在.env中加上
 ```env
