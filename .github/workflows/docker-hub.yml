@@ -9,15 +9,11 @@ jobs:
     strategy:
       matrix:
         platform: [
-          "linux/386",
           "linux/amd64",
-          "linux/arm/v5",
-          "linux/arm/v7",
-          "linux/arm/v6",
           "linux/arm64",
-          "windows/amd64",
-          "darwin/amd64",
-          "darwin/arm64"
+          "linux/ppc64le",
+          "linux/s390x",
+          "linux/386"
         ]
     continue-on-error: true        
     runs-on: ubuntu-latest
