@@ -25,8 +25,8 @@ jobs:
           context: .
           push: true
           tags: |
-            uright008/Node-OBA-Fix
-            uright008/Node-OBA-Fix:${{env.RELEASE_VERSION}}
+            uright008/node-oba-fix
+            uright008/node-oba-fix:${{env.RELEASE_VERSION}}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
