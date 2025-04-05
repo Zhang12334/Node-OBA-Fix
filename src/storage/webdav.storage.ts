@@ -6,7 +6,7 @@ import {Agent} from 'node:https'
 import pMap from 'p-map'
 import {join} from 'path'
 import rangeParser from 'range-parser'
-import {createClient, type FileStat, type WebDAVClient} from 'webdav'
+import {createClient, type FileStat, type WebDAVClient, type ResponseDataDetailed} from 'webdav'
 import {z} from 'zod'
 import {fromZodError} from 'zod-validation-error'
 import {logger} from '../logger.js'
@@ -183,8 +183,20 @@ export class WebdavStorage implements IStorage {
     const path = join(this.basePath, hashPath)
     const file = this.client.getFileDownloadLink(path)
     res.redirect(file)
-    const size = this.getSize(this.files.get(req.params.hash)?.size ?? 0, req.headers.range)
-    return {bytes: size, hits: 1}
+
+    // 如果 this.files 中没有文件信息，尝试从存储中获取文件大小
+    let size = this.files.get(hashPath)?.size ?? 0;
+    if (size === 0) {
+      try {
+        const fileStat = await this.client.stat(path);
+        // 处理 ResponseDataDetailed<FileStat> 的情况
+        size = (fileStat as ResponseDataDetailed<FileStat>).data?.size ?? (fileStat as FileStat).size;
+      } catch (e) {
+        logger.error(e, '无法获取文件大小');
+      }
+    }
+    const totalSize = this.getSize(size, req.headers.range)
+    return {bytes: totalSize, hits: 1}
   }
 
   protected getSize(size: number, range?: string): number {

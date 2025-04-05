@@ -8,6 +8,8 @@ import {z} from 'zod'
 import {fromZodError} from 'zod-validation-error'
 import {WebdavStorage} from './webdav.storage.js'
 import {config} from '../config.js'
+import {type FileStat, type ResponseDataDetailed} from 'webdav'
+import {logger} from '../logger.js'
 
 const storageConfigSchema = WebdavStorage.configSchema.extend({
   cacheTtl: z.union([z.string().optional(), z.number().int()]).default('1h'),
@@ -51,16 +53,27 @@ export class AlistWebdavStorage extends WebdavStorage {
       res.end()
       return {bytes: 0, hits: 1}
     }
-    const size = this.getSize(this.files.get(req.params.hash)?.size ?? 0, req.headers.range)
+    const path = join(this.basePath, hashPath)    
+    // 如果 this.files 中没有文件信息，尝试从存储中获取文件大小
+    let size = this.files.get(hashPath)?.size ?? 0;
+    if (size === 0) {
+      try {
+        const fileStat = await this.client.stat(path);
+        // 处理 ResponseDataDetailed<FileStat> 的情况
+        size = (fileStat as ResponseDataDetailed<FileStat>).data?.size ?? (fileStat as FileStat).size;
+      } catch (e) {
+        logger.error(e, '无法获取文件大小');
+      }
+    }
+    const totalSize = this.getSize(size, req.headers.range)
     if (!config.disableWebdav302Cache){
       // 如果没有禁用302缓存，查询缓存，如果存在则直接返回
       const cachedUrl = await this.redirectUrlCache.get(hashPath)
       if (cachedUrl) {
         res.status(302).location(cachedUrl).send()
-        return {bytes: size, hits: 1}
+        return {bytes: totalSize, hits: 1}
       }
     }
-    const path = join(this.basePath, hashPath)
     const url = this.client.getFileDownloadLink(path)
     const resp = await got.get(url, {
       followRedirect: false,
@@ -82,7 +95,7 @@ export class AlistWebdavStorage extends WebdavStorage {
     if (resp.statusCode >= 300 && resp.statusCode < 400 && resp.headers.location) {
       res.status(resp.statusCode).location(resp.headers.location).send()
       await this.redirectUrlCache.set(hashPath, resp.headers.location)
-      return {bytes: size, hits: 1}
+      return {bytes: totalSize, hits: 1}
     }
     res.status(resp.statusCode).send(resp.body)
     return {bytes: 0, hits: 0}
