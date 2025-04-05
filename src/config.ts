@@ -100,13 +100,9 @@ export class Config {
   public readonly notifyDebugMode = env.get('NOTIFY_DEBUG_MODE').asBool();
 
   // 通知消息内容
-  public readonly notifyReconnect = env.get('NOTIFY_RECONNECT').asBool();
   public readonly notifyReconnectMessage = env.get('NOTIFY_RECONNECT_MESSAGE').asString();
-  public readonly notifyStartup = env.get('NOTIFY_STARTUP').asBool();
   public readonly notifyStartupMessage = env.get('NOTIFY_STARTUP_MESSAGE').asString();
-  public readonly notifyShutdown = env.get('NOTIFY_SHUTDOWN').asBool();
   public readonly notifyShutdownMessage = env.get('NOTIFY_SHUTDOWN_MESSAGE').asString();
-  public readonly notifyError = env.get('NOTIFY_ERROR').asBool();
   public readonly notifyErrorMessage = env.get('NOTIFY_ERROR_MESSAGE').asString();
   public readonly clusterName = env.get('CLUSTER_NAME').asString()
 

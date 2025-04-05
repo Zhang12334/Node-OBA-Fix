@@ -628,7 +628,7 @@ export class Cluster {
           this.enable()
             .then(() => {
               logger.info('重试连接并且准备就绪');
-              if (config.notifyReconnect) {
+              if (config.notifyEnabled) {
                 notify.send(config.notifyReconnectMessage || "节点已重新连接"); 
               }
             })
@@ -679,7 +679,7 @@ export class Cluster {
       throw new Error('节点禁用失败')
     }
     this.socket?.disconnect()
-    if (config.notifyShutdown) {
+    if (config.notifyEnabled) {
       notify.send(config.notifyShutdownMessage || "节点已下线"); 
     }
   }
@@ -829,7 +829,7 @@ export class Cluster {
     }
 
     logger.info(colors.rainbow('开始提供服务'))
-    if (config.notifyStartup) {
+    if (config.notifyEnabled) {
       notify.send(config.notifyStartupMessage || "节点已上线"); 
     }
     this.keepalive.start(this.socket)
