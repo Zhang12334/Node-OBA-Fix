@@ -210,7 +210,7 @@ export async function bootstrap(protocol_version: string): Promise<void> {
 
   // 如果是 alist 类型存储，生成 10MB 的测速文件
   if (storageType === 'alist') {
-    logger.debug('准备预生成测速文件');
+    logger.info('准备为 Alist 预生成测速文件');
     try {
       // 同时生成 1MB 和 10MB 测速文件
       await Promise.all([
@@ -227,7 +227,7 @@ export async function bootstrap(protocol_version: string): Promise<void> {
 
   const configuration = await cluster.getConfiguration();
   const files = await cluster.getFileList();
-  sync_logger.info(`云端文件数量: ${files.files.length} files`);
+  sync_logger.info(`云端文件数量: ${files.files.length}`);
 
   if (config.disableSyncFiles) {
     // 先检查是否禁用文件同步
@@ -259,8 +259,8 @@ export async function bootstrap(protocol_version: string): Promise<void> {
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');
     logger.warn('节点上线功能已禁用');    
-    if(config.notifyDebugMode){
-      notify.send(`节点上线功能已禁用`)
+    if(config.notifyEnabled){
+      notify.send(`节点启动完毕, 上线功能已禁用`)
     }          
 
     // 在禁用节点上线时也支持同步文件
@@ -281,6 +281,9 @@ export async function bootstrap(protocol_version: string): Promise<void> {
       logger.info('请求上线');
       await cluster.enable();
       logger.info(colors.rainbow(`节点启动完毕, 正在提供 ${files.files.length} 个文件`));
+      if(config.notifyEnabled){
+        notify.send(config.notifyStartupMessage || `节点启动完毕, 正在提供 ${files.files.length} 个文件`)
+      }       
       if (nodeCluster.isWorker && typeof process.send === 'function') {
         process.send('ready');
       }
