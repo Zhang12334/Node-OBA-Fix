@@ -46,7 +46,7 @@
   transform: scale(0.98);
 }
 
-/* 平板设备不显示提示 */
+/* 宽度足够则不显示提示 */
 @media (min-width: 768px) {
   .pc-alert {
     display: none !important;
