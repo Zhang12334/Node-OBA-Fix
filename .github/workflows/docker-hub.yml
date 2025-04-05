@@ -1,8 +1,6 @@
 name: "构建 - Docker Test"
 
-on:
-  push:
-    branches: [ master, next ]
+on: push
 
 jobs:
   build:
@@ -10,12 +8,8 @@ jobs:
       matrix:
         platform: [
           "linux/amd64",
-          "linux/arm64",
-          "linux/ppc64le",
-          "linux/s390x",
-          "linux/386"
-        ]
-    continue-on-error: true        
+          "linux/arm64"
+        ]       
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

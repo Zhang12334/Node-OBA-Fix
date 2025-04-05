@@ -7,6 +7,12 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        platform: [
+          "linux/amd64",
+          "linux/arm64"
+        ]    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +33,6 @@ jobs:
           tags: |
             zhang134/node-oba-fix
             zhang134/node-oba-fix:${{env.RELEASE_VERSION}}
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
