@@ -833,9 +833,6 @@ export class Cluster {
     }
 
     logger.info(colors.rainbow('开始提供服务'))
-    if (config.notifyEnabled) {
-      notify.send(config.notifyStartupMessage || "节点已上线"); 
-    }
     this.keepalive.start(this.socket)
   }
 
