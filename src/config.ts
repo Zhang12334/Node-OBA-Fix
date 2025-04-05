@@ -73,6 +73,7 @@ export class Config {
   public readonly SyncInterval = env.get('SYNC_INTERVAL').asString()
   public readonly AlwaysCheckMissingFiles = env.get('SYNC_ALWAYS_CHECK_MISSING_FILES').asBool()
   public readonly disableNewSyncStatus = env.get('SYNC_DISABLE_NEW_SYNC_STATUS').asBool()  
+  public readonly skipStorageCheck = env.get('SYNC_SKIP_STORAGE_CHECK').asBool()
 
   // 通知配置项
   public readonly notifyEnabled = env.get('NOTIFY_ENABLED').asBool();

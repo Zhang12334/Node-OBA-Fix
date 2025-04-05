@@ -199,9 +199,13 @@ export async function bootstrap(protocol_version: string): Promise<void> {
   logger.debug('正在检查端口');
   await cluster.portCheck();
 
-  const storageReady = await cluster.storage.check();
-  if (!storageReady) {
-    throw new Error('存储异常');
+  if (!config.skipStorageCheck) {
+    const storageReady = await cluster.storage.check();
+    if (!storageReady) {
+      throw new Error('存储异常');
+    }
+  } else {
+    logger.warn('已跳过存储检查');
   }
 
   // 如果是 alist 类型存储，生成 10MB 的测速文件

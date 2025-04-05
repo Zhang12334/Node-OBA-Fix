@@ -202,10 +202,14 @@ export class Cluster {
   }
 
   public async syncFiles(fileList: IFileList, syncConfig: OpenbmclapiAgentConfiguration['sync']): Promise<void> {
-    const storageReady = await this.storage.check()
+  if (!config.skipStorageCheck) {
+    const storageReady = await this.storage.check();
     if (!storageReady) {
-      throw new Error('存储异常')
+      throw new Error('存储异常');
     }
+  } else {
+    logger.warn('已跳过存储检查');
+  }
     sync_logger.info('正在检查缺失文件')
     const missingFiles = await this.storage.getMissingFiles(fileList.files)
     if (missingFiles.length === 0) {
