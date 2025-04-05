@@ -4,7 +4,7 @@ FROM $BASE_IMAGE AS install
 WORKDIR /opt/openbmclapi
 RUN apt update && \
     apt install -y build-essential python3
-COPY package-lock.json package.json tsconfig.json ./
+COPY package-lock.json package.json tsconfig.json copy-files.cjs ./
 RUN npm ci
 COPY src ./src
 RUN npm run build
@@ -15,7 +15,7 @@ WORKDIR /opt/openbmclapi
 RUN apt update && \
     apt install -y build-essential python3
 COPY package-lock.json package.json ./
-RUN npm ci --omit=dev
+RUN npm i --no-package-lock
 
 FROM $BASE_IMAGE AS build
 
