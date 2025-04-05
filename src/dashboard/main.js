@@ -325,6 +325,6 @@ export const PanelServe = (_app, _storage) => {
 			statsDataTemp: statsDataTemp,
 		});
 	});
-	dash_logger.info(`API已启用`);
+	dash_logger.debug(`API已启用`);
 };
 
