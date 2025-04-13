@@ -23,7 +23,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: uright008/node-oba-fix:next
+          tags: zhang134/node-oba-fix:dev
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
