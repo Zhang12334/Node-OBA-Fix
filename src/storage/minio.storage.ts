@@ -78,7 +78,11 @@ export class MinioStorage implements IStorage {
 
   public async exists(path: string): Promise<boolean> {
     try {
-      await this.internalClient.statObject(this.bucket, join(this.prefix, path))
+      if (this.customHost) {
+        const res = await fetch(join(this.customHost, this.prefix, path),{method: 'HEAD'})
+        return res.ok
+      }
+      else await this.internalClient.statObject(this.bucket, join(this.prefix, path))
       return true
     } catch {
       return false
