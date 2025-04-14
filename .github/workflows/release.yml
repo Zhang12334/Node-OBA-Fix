@@ -74,52 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_name }}
-
-
-
-  # build-full-install-zip-armv7l:
-  #   name: "构建 - 全量安装包 [ArmV7L]"
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include:
-  #         # 自托管 Onecloud runner, 构建 ArmV7L 发行版
-  #         - os: self-hosted
-  #           artifact_name: "Node-OBA-Fix-linux-armv7l.tar.xz"            
-
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - name: "获取源代码"
-  #       uses: actions/checkout@v4
-
-  #     - name: "设置 Node.js 编译环境"
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '22'
-  #         cache: 'npm'
-
-  #     - name: "安装依赖"
-  #       run: npm i --no-package-lock
-
-  #     - name: "构建"
-  #       run: npm run build
-
-  #     ## Linux & MacOS
-  #     - name: "复制 Node.js 和运行脚本"
-  #       run: |
-  #         cp $(which node) .
-  #         cp platforms/linux/run.sh .
-
-  #     - name: "打包为 tar.xz 文件"
-  #       run: |
-  #         tar -caf ${{ matrix.artifact_name }} dist nginx package.json node_modules node run.sh
-
-  #     - name: "上传文件"
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.artifact_name }}
-  #         path: ${{ matrix.artifact_name }}          
+          path: ${{ matrix.artifact_name }}   
 
   build-update-zip:
     name: "构建 - 增量更新包"
@@ -173,35 +128,25 @@ jobs:
       - name: "下载构建文件"
         uses: actions/download-artifact@v4
         
-      - name: "重新打包 Linux X64"
+      - name: "复制 Linux X64 文件"
         run: |
-          cd Node-OBA-Fix-linux-x64.tar.xz
-          zip -r ../Node-OBA-Fix-linux-x64.tar.xz.zip *
-          cd ..
-  
-      - name: "重新打包 Linux Arm64"
-        run: |
-          cd Node-OBA-Fix-linux-arm64.tar.xz
-          zip -r ../Node-OBA-Fix-linux-arm64.tar.xz.zip *
-          cd ..
+          cp Node-OBA-Fix-linux-x64.tar.xz/Node-OBA-Fix-linux-x64.tar.xz ./
 
-      - name: "重新打包 MacOS X64"
+      - name: "复制 Linux Arm64 文件"
         run: |
-          cd Node-OBA-Fix-macos-x64.tar.xz
-          zip -r ../Node-OBA-Fix-macos-x64.tar.xz.zip *
-          cd ..
-  
-      - name: "重新打包 MacOS Arm64"
+          cp Node-OBA-Fix-linux-arm64.tar.xz/Node-OBA-Fix-linux-arm64.tar.xz ./
+
+      - name: "复制 MacOS X64 文件"
         run: |
-          cd Node-OBA-Fix-macos-arm64.tar.xz
-          zip -r ../Node-OBA-Fix-macos-arm64.tar.xz.zip *
-          cd ..
-  
-      - name: "重新打包 Windows X64"
+          cp Node-OBA-Fix-macos-x64.tar.xz/Node-OBA-Fix-macos-x64.tar.xz ./
+
+      - name: "复制 MacOS Arm64 文件"
         run: |
-          cd Node-OBA-Fix-windows-x64.tar.gz
-          zip -r ../Node-OBA-Fix-windows-x64.tar.gz.zip *
-          cd ..
+          cp Node-OBA-Fix-macos-arm64.tar.xz/Node-OBA-Fix-macos-arm64.tar.xz ./
+
+      - name: "复制 Windows X64 文件"
+        run: |
+          cp Node-OBA-Fix-windows-x64.tar.gz/Node-OBA-Fix-windows-x64.tar.gz ./
   
       - name: "重新打包 增量更新包"
         run: |
@@ -218,30 +163,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            Node-OBA-Fix-linux-x64.tar.xz.zip
-            Node-OBA-Fix-linux-arm64.tar.xz.zip          
-            Node-OBA-Fix-macos-x64.tar.xz.zip
-            Node-OBA-Fix-macos-arm64.tar.xz.zip
-            Node-OBA-Fix-windows-x64.tar.gz.zip
+            Node-OBA-Fix-linux-x64.tar.xz
+            Node-OBA-Fix-linux-arm64.tar.xz       
+            Node-OBA-Fix-macos-x64.tar.xz
+            Node-OBA-Fix-macos-arm64.tar.xz
+            Node-OBA-Fix-windows-x64.tar.gz
             update.zip
-
-
-  # upload-to-release-armv7l:
-  #   name: "打包 - 上传至 Release [ArmV7L]"
-  #   runs-on: ubuntu-latest
-  #   needs: [build-full-install-zip-armv7l]
-  #   steps:
-  #     - name: "下载构建文件"
-  #       uses: actions/download-artifact@v4
-  
-  #     - name: "重新打包 Linux ArmV7L"
-  #       run: |
-  #         cd Node-OBA-Fix-linux-armv7l.tar.xz
-  #         zip -r ../Node-OBA-Fix-linux-armv7l.tar.xz.zip *
-  #         cd ..  
-
-  #     - name: "上传至 Release"
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         files: |
-  #           Node-OBA-Fix-linux-armv7l.tar.xz.zip            
