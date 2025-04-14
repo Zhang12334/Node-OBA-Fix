@@ -18,6 +18,7 @@ import fs from 'fs';
 const packageJson = JSON.parse(readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8')) as {
   protocol_version: string
   version: string
+  dev: boolean
 }
 
 // 加载env
@@ -38,6 +39,18 @@ if (!config.noDaemon && cluster.isPrimary) {
   logger.info(colors.green(`Booting Node-OBA-Fix`));
   logger.info(colors.green(`当前版本: ${packageJson.version}`));
   logger.info(colors.green(`协议版本: ${packageJson.protocol_version}`));  
+  if (packageJson.dev) {
+    // 重复5次警告
+    for (let i = 0; i < 5; i++) {
+      logger.warn(colors.yellow(`当前版本为测试构建版本, 不建议在生产环境中使用!`));
+    }
+    
+    // 未跳过延迟，3s后启动
+    if (!config.skipDevDelay) {
+      logger.warn(colors.yellow(`3s 后启动, 如需跳过延迟, 请在 env 中配置 SKIP_DEV_DELAY=true`));
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+  }
   if (config.notifyDebugMode) {
     notify.send(`Booting Node-OBA-Fix ${packageJson.version}`)
   }

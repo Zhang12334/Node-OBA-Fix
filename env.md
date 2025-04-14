@@ -61,6 +61,7 @@
 | CLUSTER_ALLOW_NO_SIGN      |  否  | false                  | 是否允许未签名的请求                                                                                                                            |
 | CLUSTER_NO_ENABLE          |  否  | false                  | 是否禁用节点上线（会连接主控、请求证书、同步，但不会请求上线，一般用于调试或同步文件, 不建议在生产环境中使用）                                          |
 | CLUSTER_NO_CONNECT         |  否  | false                  | 是否禁用连接主控（不会请求证书、上线，但会同步、处理请求，可配合自定义证书搭建针对单节点多线的多端负载均衡, 此功能覆盖CLUSTER_NO_ENABLE）                |
+| SKIP_DEV_DELAY             |  否  | false                  | 是否禁用测试构建版本的3s启动延迟（在release版本中无效）                                                                                            |
 
 ## 通知配置项
 
