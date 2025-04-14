@@ -7,7 +7,11 @@ RUN apt update && \
 COPY package-lock.json package.json tsconfig.json copy-files.cjs ./
 RUN npm ci
 COPY src ./src
-RUN npm run build
+
+# 引入构建参数
+ARG BUILD_COMMAND=build
+# 参数决定构建命令
+RUN npm run $BUILD_COMMAND 
 
 FROM $BASE_IMAGE AS modules
 WORKDIR /opt/openbmclapi

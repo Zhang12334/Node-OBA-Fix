@@ -23,7 +23,7 @@ jobs:
         run: npm i --no-package-lock
 
       - name: "测试构建"
-        run: npm run build
+        run: npm run build_dev
 
       ## Linux & MacOS
       - name: "复制 Node.js 和运行脚本"
@@ -58,7 +58,7 @@ jobs:
         run: npm i --no-package-lock
 
       - name: "测试构建"
-        run: npm run build
+        run: npm run build_dev
 
       ## Linux & MacOS
       - name: "复制 Node.js 和运行脚本"
@@ -74,28 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-linux-arm64
-          path: build-linux-arm64.tar.xz
-
-  # 去掉, 无需测试ArmV7L
-
-  # build-armv7l-test:
-  #   name: "测试构建 - Linux ArmV7L"
-  #   runs-on: self-hosted  # 使用自托管 runner
-  #   steps:
-  #     - name: "获取源代码"
-  #       uses: actions/checkout@v4
-
-  #     - name: "设置 Node.js 编译环境"
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '22'
-  #         cache: 'npm'
-
-  #     - name: "安装依赖"
-  #       run: npm i --no-package-lock
-
-  #     - name: "测试构建"
-  #       run: npm run build             
+          path: build-linux-arm64.tar.xz        
 
   build-macos-x64:
     name: "测试构建 - MacOS x64"
@@ -114,7 +93,7 @@ jobs:
         run: npm i --no-package-lock
 
       - name: "测试构建"
-        run: npm run build
+        run: npm run build_dev
 
       ## Linux & MacOS
       - name: "复制 Node.js 和运行脚本"
@@ -149,7 +128,7 @@ jobs:
         run: npm i --no-package-lock
 
       - name: "测试构建"
-        run: npm run build
+        run: npm run build_dev
         
       ## Linux & MacOS
       - name: "复制 Node.js 和运行脚本"
@@ -184,7 +163,7 @@ jobs:
         run: npm i --no-package-lock
 
       - name: "测试构建"
-        run: npm run build   
+        run: npm run build_dev   
 
       ## Windows
       - name: "复制 Node.js 和运行脚本"

@@ -65,6 +65,7 @@ export class Config {
   // 版本
   public readonly protocol_version = packageJson.protocol_version
   public readonly version = packageJson.version
+  public readonly skipDevDelay = env.get('SKIP_DEV_DELAY').asBool()
 
   // 同步配置项
   public readonly syncConcurrency = env.get('SYNC_CONCURRENCY').asInt()
