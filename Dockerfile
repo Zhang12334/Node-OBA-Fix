@@ -4,7 +4,7 @@ FROM $BASE_IMAGE AS install
 WORKDIR /opt/openbmclapi
 RUN apt update && \
     apt install -y build-essential python3
-COPY package-lock.json package.json tsconfig.json copy-files.cjs ./
+COPY package-lock.json package.json tsconfig.json build_dev.cjs build_release.cjs ./
 RUN npm ci
 COPY src ./src
 
