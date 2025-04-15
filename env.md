@@ -89,11 +89,10 @@
 
 | 环境变量                    | 必填 | 默认值                 | 支持的选项               | 说明                                                                                                                                        |
 |----------------------------|------|-----------------------|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| NOTIFY_RECONNECT           |  否  | false                  | true / false            | 是否启用节点重连时触发的通知                                                                                                                  |
-| NOTIFY_STARTUP             |  否  | false                  | true / false            | 是否启用节点上线时触发的通知                                                                                                                  |
-| NOTIFY_SHUTDOWN            |  否  | false                  | true / false            | 是否启用节点下线时触发的通知                                                                                                                  |
-| NOTIFY_ERROR               |  否  | false                  | true / false            | 是否启用节点工作进程异常退出时触发的通知                                                                                                       |
-| 对应配置项_MESSAGE          |  否  | -                      | -                       | 自定义触发通知时发送的消息，如：NOTIFY_ERROR_MESSAGE / NOTIFY_SHUTDOWN_MESSAGE                                                                |
+| NOTIFY_RECONNECT_MESSAGE           |  否  | false                  | true / false            | 自定义节点重连时触发的通知消息                                                                                                                  |
+| NOTIFY_STARTUP_MESSAGE             |  否  | false                  | true / false            | 自定义节点上线时触发的通知消息                                                                                                                  |
+| NOTIFY_SHUTDOWN_MESSAGE            |  否  | false                  | true / false            | 自定义节点下线时触发的通知消息                                                                                                                  |
+| NOTIFY_ERROR_MESSAGE               |  否  | false                  | true / false            | 自定义节点工作进程异常退出时触发的通知消息                                                                                                       |
 | CLUSTER_NAME               |  否  | Cluster                | 一个字符串               | 自定义节点名称, 目前会在同步、通知时应用: 同步文件显示为 [Sync-节点名称], 通知显示为 [Cluster] 节点已下线                                         |
 
 备注：消息推送的整体结构为 `[节点名称] 消息内容`，如：`[Cluster] 节点已下线`、`[Cluster] 节点已重连`
