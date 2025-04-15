@@ -7,6 +7,7 @@ import {z} from 'zod'
 import {logger} from '../logger.js'
 import {IFileInfo, IGCCounter} from '../types.js'
 import {IStorage} from './base.storage.js'
+import Fetch from 'node-fetch'
 
 const storageConfigSchema = z.object({
   url: z.string(),
@@ -79,7 +80,7 @@ export class MinioStorage implements IStorage {
   public async exists(path: string): Promise<boolean> {
     try {
       if (this.customHost) {
-        const res = await fetch(join(this.customHost, this.prefix, path),{method: 'HEAD'})
+        const res = await Fetch(join(this.customHost, this.prefix, path),{method: 'HEAD'})
         return res.ok
       }
       else await this.internalClient.statObject(this.bucket, join(this.prefix, path))
