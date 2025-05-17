@@ -6,6 +6,7 @@ import ms from 'ms'
 import {join} from 'path'
 import {z} from 'zod'
 import {fromZodError} from 'zod-validation-error'
+import {getSize} from '../util.js'
 import {WebdavStorage} from './webdav.storage.js'
 import {config} from '../config.js'
 import {type FileStat, type ResponseDataDetailed} from 'webdav'
@@ -65,7 +66,7 @@ export class AlistWebdavStorage extends WebdavStorage {
         logger.error(e, '无法获取文件大小');
       }
     }
-    const totalSize = this.getSize(size, req.headers.range)
+    const totalSize = getSize(size, req.headers.range)
     if (!config.disableWebdav302Cache){
       // 如果没有禁用302缓存，查询缓存，如果存在则直接返回
       const cachedUrl = await this.redirectUrlCache.get(hashPath)

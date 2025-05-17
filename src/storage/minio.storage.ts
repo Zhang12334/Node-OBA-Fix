@@ -1,11 +1,13 @@
 import colors from 'colors/safe.js'
 import {Request, Response} from 'express'
-import {BucketItem, Client} from 'minio'
+import Keyv from 'keyv'
+import {BucketItem, Client, S3Error} from 'minio'
+import ms from 'ms'
 import {basename, join} from 'path'
-import rangeParser from 'range-parser'
 import {z} from 'zod'
 import {logger} from '../logger.js'
 import {IFileInfo, IGCCounter} from '../types.js'
+import {getSize} from '../util.js'
 import {IStorage} from './base.storage.js'
 import Fetch from 'node-fetch'
 
@@ -18,6 +20,9 @@ const storageConfigSchema = z.object({
 export class MinioStorage implements IStorage {
   /** Map<hash, FileInfo> */
   protected files = new Map<string, {size: number; path: string}>()
+  protected existsCache = new Keyv({
+    ttl: ms('1h'),
+  })
 
   private readonly client: Client
   private readonly internalClient: Client
@@ -85,8 +90,13 @@ export class MinioStorage implements IStorage {
       }
       else await this.internalClient.statObject(this.bucket, join(this.prefix, path))
       return true
-    } catch {
-      return false
+    } catch (e) {
+      if (e instanceof S3Error) {
+        if (e.code === 'NoSuchKey') {
+          return false
+        }
+      }
+      throw e
     }
   }
 
@@ -114,7 +124,7 @@ export class MinioStorage implements IStorage {
       url = await this.client.presignedGetObject(this.bucket, path, 60, resHeaders)
     }
     res.redirect(url)
-    const size = this.getSize(this.files.get(req.params.hash)?.size ?? 0, req.headers.range)
+    const size = getSize(this.files.get(req.params.hash)?.size ?? 0, req.headers.range)
     return {bytes: size, hits: 1}
   }
 
@@ -171,18 +181,5 @@ export class MinioStorage implements IStorage {
   public async writeFile(path: string, content: Buffer, fileInfo: IFileInfo): Promise<void> {
     await this.internalClient.putObject(this.bucket, join(this.prefix, path), content)
     this.files.set(fileInfo.hash, fileInfo)
-  }
-
-  protected getSize(size: number, range?: string): number {
-    if (!range) return size
-    const ranges = rangeParser(size, range, {combine: true})
-    if (typeof ranges === 'number') {
-      return size
-    }
-    let total = 0
-    for (const range of ranges) {
-      total += range.end - range.start + 1
-    }
-    return total
   }
 }
