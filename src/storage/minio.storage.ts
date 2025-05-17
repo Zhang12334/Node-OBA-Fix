@@ -84,11 +84,11 @@ export class MinioStorage implements IStorage {
 
   public async exists(path: string): Promise<boolean> {
     try {
-      if (this.customHost) {
-        const res = await Fetch(join(this.customHost, this.prefix, path),{method: 'HEAD'})
-        return res.ok
+      if (await this.existsCache.has(path)) {
+        return true
       }
-      else await this.internalClient.statObject(this.bucket, join(this.prefix, path))
+      await this.internalClient.statObject(this.bucket, join(this.prefix, path))
+      await this.existsCache.set(path, true)
       return true
     } catch (e) {
       if (e instanceof S3Error) {
