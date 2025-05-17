@@ -9,7 +9,6 @@ import {logger} from '../logger.js'
 import {IFileInfo, IGCCounter} from '../types.js'
 import {getSize} from '../util.js'
 import {IStorage} from './base.storage.js'
-import Fetch from 'node-fetch'
 
 const storageConfigSchema = z.object({
   url: z.string(),
