@@ -258,13 +258,10 @@ export const PanelListener = async (req, bytes, hits) => {
 		  ipToUse = extractedIPv4;
 		}		
 
-		if (isIPv4(ipToUse)) {
-			statsDataTemp.network.v4 ++;
-		} else if (isIPv6(ipToUse)) {
+		if (isIPv6(ipToUse)) {
 			statsDataTemp.network.v6 ++;
 		} else {
-			// 如果既不是 IPv4 也不是 IPv6，爆！
-			dash_logger.error(`未知的IP类型: ${ipToUse}`);
+			statsDataTemp.network.v4 ++;
 		}
 		
 	} catch(err) {
